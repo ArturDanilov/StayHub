@@ -1,4 +1,4 @@
-namespace PulseHub.Api.Models;
+namespace PulseHub.Domain.Models;
 
 public class Source
 {

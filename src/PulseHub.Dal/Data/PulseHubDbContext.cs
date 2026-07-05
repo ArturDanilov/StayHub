@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using PulseHub.Api.Models;
+using PulseHub.Domain.Models;
 
-namespace PulseHub.Api.Data;
+namespace PulseHub.Dal.Data;
 
 public class PulseHubDbContext(DbContextOptions<PulseHubDbContext> options) : DbContext(options)
 {
