@@ -13,4 +13,4 @@ TestResults/
 
 *.db
 
-*.log
+*.log.DS_Store
