@@ -1,11 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PulseHub.Api.Constant;
+using PulseHub.Api.Constants;
 using PulseHub.Dal.Data;
 using PulseHub.Domain.Models;
 
 namespace PulseHub.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route(ApiRoutes.Sources.Base)]
 public class SourcesController(PulseHubDbContext dbContext) : ControllerBase

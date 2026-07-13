@@ -1,11 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PulseHub.Api.Constant;
+using PulseHub.Api.Constants;
 using PulseHub.Business.Interfaces;
 using PulseHub.Business.Results;
 using PulseHub.Contracts.Reservations;
 
 namespace PulseHub.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route(ApiRoutes.Reservations.Base)]
 public sealed class ReservationsController(

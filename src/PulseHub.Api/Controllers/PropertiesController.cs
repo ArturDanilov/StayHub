@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using PulseHub.Api.Constant;
+using PulseHub.Api.Constants;
 using PulseHub.Business.Interfaces;
 using PulseHub.Contracts.Properties;
 
