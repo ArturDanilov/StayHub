@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\PulseHub.Domain\PulseHub.Domain.csproj" />
+        <ProjectReference Include="..\PulseHub.Business\PulseHub.Business.csproj" />
     </ItemGroup>
 
 </Project>

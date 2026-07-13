@@ -1,1 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk"/>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\PulseHub.Domain\PulseHub.Domain.csproj" />
+    <ProjectReference Include="..\PulseHub.Contracts\PulseHub.Contracts.csproj" />
+  </ItemGroup>
+</Project>

@@ -18,6 +18,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\PulseHub.Dal\PulseHub.Dal.csproj" />
+        <ProjectReference Include="..\PulseHub.Business\PulseHub.Business.csproj" />
+        <ProjectReference Include="..\PulseHub.Contracts\PulseHub.Contracts.csproj" />
     </ItemGroup>
 
 </Project>
