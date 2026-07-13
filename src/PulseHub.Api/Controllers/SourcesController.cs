@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PulseHub.Api.Constant;
 using PulseHub.Dal.Data;
 using PulseHub.Domain.Models;
 
 namespace PulseHub.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route(ApiRoutes.Sources.Base)]
 public class SourcesController(PulseHubDbContext dbContext) : ControllerBase
 {
     [HttpGet]
@@ -17,7 +18,7 @@ public class SourcesController(PulseHubDbContext dbContext) : ControllerBase
             .ToListAsync();
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet(ApiRoutes.Sources.ById)]
     public async Task<ActionResult<Source>> GetById(int id)
     {
         var source = await dbContext.Sources.FindAsync(id);
@@ -40,7 +41,7 @@ public class SourcesController(PulseHubDbContext dbContext) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = source.Id }, source);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut(ApiRoutes.Sources.ById)]
     public async Task<IActionResult> Update(int id, Source source)
     {
         var existingSource = await dbContext.Sources.FindAsync(id);
@@ -58,7 +59,7 @@ public class SourcesController(PulseHubDbContext dbContext) : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete(ApiRoutes.Sources.ById)]
     public async Task<IActionResult> Delete(int id)
     {
         var source = await dbContext.Sources.FindAsync(id);
