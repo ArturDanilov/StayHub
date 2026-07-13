@@ -20,5 +20,6 @@ public class ApiRoutes
     {
         public const string Base = $"{Api}/reservations";
         public const string ById = "{id:int}";
+        public const string Status = "{id:int}/status";
     }
 }

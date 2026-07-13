@@ -1,6 +1,6 @@
 using PulseHub.Contracts.Properties;
 
-namespace PulseHub.Business.Managers;
+namespace PulseHub.Business.Interfaces;
 
 public interface IPropertyManager
 {

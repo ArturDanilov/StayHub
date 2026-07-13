@@ -1,6 +1,6 @@
 using PulseHub.Domain.Models;
 
-namespace PulseHub.Business.Repositories;
+namespace PulseHub.Business.Interfaces;
 
 public interface IPropertyRepository
 {

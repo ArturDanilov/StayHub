@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using PulseHub.Business.Repositories;
+using PulseHub.Business.Interfaces;
 using PulseHub.Dal.Data;
 using PulseHub.Domain.Models;
 

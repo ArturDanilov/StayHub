@@ -1,4 +1,4 @@
-using PulseHub.Business.Repositories;
+using PulseHub.Business.Interfaces;
 using PulseHub.Contracts.Properties;
 using PulseHub.Mapping.Properties;
 

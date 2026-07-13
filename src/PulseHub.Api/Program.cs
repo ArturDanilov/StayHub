@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using PulseHub.Business.Interfaces;
 using PulseHub.Business.Managers;
-using PulseHub.Business.Repositories;
 using PulseHub.Dal.Data;
 using PulseHub.Dal.Repositories;
 
@@ -16,6 +16,8 @@ builder.Services.AddDbContext<PulseHubDbContext>(options =>
 
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IPropertyManager, PropertyManager>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationManager, ReservationManager>();
 
 var app = builder.Build();
 
