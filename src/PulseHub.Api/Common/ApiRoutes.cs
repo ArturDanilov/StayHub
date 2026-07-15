@@ -28,4 +28,10 @@ public class ApiRoutes
         public const string ById = "{id:int}";
         public const string Status = "{id:int}/status";
     }
+    
+    public static class Guests
+    {
+        public const string Base = $"{Api}/guests";
+        public const string ById = "{id:int}";
+    }
 }

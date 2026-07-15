@@ -1,168 +1,381 @@
 # PulseHub Architecture
 
-## Purpose
+## Overview
 
-PulseHub is a telemetry platform for collecting, normalizing, storing and later visualizing data from different sources.
+PulseHub is an **API-first hospitality integration platform** built with **ASP.NET Core**.
 
-The first version focuses on simple and understandable data sources, such as mock sensors, weather data, smart home devices and later MQTT/Home Assistant integrations.
+Its purpose is to synchronize **reservations**, **guests**, **properties**, and related data from external Property Management Systems (PMS), booking providers, and other hospitality services into a unified domain model.
 
-The long-term idea is to build a system that can evolve into an industrial-style monitoring platform.
+The project is designed as a learning platform for modern backend architecture and mirrors many concepts used in real-world products such as **Apaleo**.
 
 ---
 
-## Core Data Flow
+# High-Level Architecture
 
-```text
-Source
-  -> Collector
-  -> Parser
-  -> Normalizer
-  -> Measurement
-  -> Database
-  -> API
-  -> SignalR
-  -> UI
+```mermaid
+flowchart TD
+
+A[External Systems]
+B[Source]
+C[Source Client]
+D[Background Service]
+E[Parser]
+F[Mapper]
+G[Business Layer]
+H[Repositories]
+I[(SQL Server)]
+J[REST API]
+K[SignalR]
+L[Frontend]
+
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+G --> H
+H --> I
+I --> J
+J --> K
+K --> L
 ```
 
-##  Main Concepts
-Source
+---
 
-A Source describes where data comes from.
-
-Examples:
-
-Mock Sensor
-Weather API
-Shelly Device
-MQTT Topic
-Home Assistant
-Virtual PLC
-
-A Source does not store measurements itself. It only describes the origin of data.
-
-##  Collector
-
-A Collector knows how to get raw data from a specific Source.
-
-Examples:
-
-HTTP Collector
-MQTT Collector
-Mock Collector
-File Collector
-
-Collectors return raw data.
-
-##  Parser
-
-A Parser understands the format of raw data.
-
-Examples:
-
-JSON Parser
-Plain Text Parser
-Custom Shelly Parser
-Custom Weather Parser
-
-The parser converts raw data into structured intermediate data.
-
-##  Normalizer
-
-The Normalizer converts parsed data into a unified internal format.
-
-This is important because different sources may return different field names, formats and units.
-
-Example:
-
-Shelly: { "power": 38.2 }
-Weather API: { "temperature": 21.5 }
-
-Normalized:
-MetricName
-Value
-Unit
-Timestamp
-SourceId
-Measurement
-
-##  A Measurement is the main stored telemetry value.
-
-Example:
-
-Device: Desk Plug
-Metric: Power
-Value: 38.2
-Unit: W
-Timestamp: 2026-07-05T18:00:00
-First MVP
-
-The first MVP should be intentionally simple.
-
-It should support:
-
-Create a Source
-Generate mock measurements
-Store measurements in SQL Server
-Read latest measurements via API
-Read measurement history via API
-
-No authentication in the first version.
-
-No frontend in the first version.
-
-No microservices in the first version.
-
-##  Architectural Principles
-Start as a modular monolith
-
-The project starts as a modular monolith because it is easier to develop, debug and refactor.
-
-Microservices should be introduced only when clear module boundaries exist.
-
-Keep external data separate from internal data
-
-Raw data from sources should not be used directly as domain data.
-
-External formats must be parsed and normalized first.
-
-Avoid unnecessary abstractions
-
-The project should not introduce patterns only for the sake of using patterns.
-
-Every abstraction should solve a real problem.
-
-# Roadmap
-
-```text
-Phase 1
-Property + Reservation CRUD
-
-Phase 2
-DTOs + custom mapper + repository + manager
-
-Phase 3
-Mock reservation webhook
-
-Phase 4
-Webhook idempotency and event history
-
-Phase 5
-SignalR live reservation updates
-
-Phase 6
-Integration and API tests
-
-Phase 7
-OAuth 2.0 / OpenID Connect
-
-Phase 8
-Connect to an Apaleo sandbox
-
-Phase 9
-Background processing and message broker
-
-Phase 10
-Payments or check-in integration
+# Solution Structure
 
 ```
+PulseHub
+│
+├── PulseHub.Api
+├── PulseHub.Business
+├── PulseHub.Contracts
+├── PulseHub.Dal
+├── PulseHub.Domain
+├── PulseHub.Mapping
+│
+├── tests
+└── wiki
+```
 
+Each project has a single responsibility.
+
+| Project | Responsibility |
+|---------|----------------|
+| **Api** | Controllers, Authentication, Dependency Injection |
+| **Business** | Business logic, Managers, Validation |
+| **Contracts** | DTOs used by the API |
+| **Dal** | Entity Framework Core, Repositories, Migrations |
+| **Domain** | Domain entities and enums |
+| **Mapping** | Mapping between Domain and DTOs |
+
+---
+
+# Core Domain
+
+## Property
+
+Represents a hotel, apartment, or accommodation.
+
+Examples
+
+- Hotel
+- Hostel
+- Apartment
+- Vacation Home
+
+---
+
+## Guest
+
+Represents a customer.
+
+Examples
+
+- John Smith
+- Max Mustermann
+
+A guest may have multiple reservations.
+
+---
+
+## Reservation
+
+Represents a booking.
+
+Every reservation belongs to exactly one:
+
+- Property
+- Guest
+
+Current lifecycle:
+
+```mermaid
+stateDiagram-v2
+
+Confirmed --> CheckedIn
+CheckedIn --> CheckedOut
+Confirmed --> Cancelled
+```
+
+Reservations may be cancelled before arrival.
+
+---
+
+## Source
+
+A **Source** describes where reservation data originates.
+
+Examples
+
+- Mock Source
+- Apaleo
+- Booking.com
+- CSV Import
+- REST API
+- Webhook
+
+A Source **never performs synchronization itself**.
+
+It only describes the integration.
+
+---
+
+# Reservation Synchronization Pipeline
+
+```mermaid
+flowchart TD
+
+A[Source]
+B[Source Client]
+C[Download Data]
+D[Parse Response]
+E[Map to Domain]
+F[Business Validation]
+G[(SQL Server)]
+
+A --> B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+```
+
+---
+
+# Authentication
+
+Current implementation
+
+- JWT Bearer Authentication
+- Role-based Authorization
+- Policy-based Authorization
+- Swagger JWT Support
+
+Planned
+
+- Keycloak
+- OAuth 2.0
+- OpenID Connect
+- Refresh Tokens
+
+---
+
+# Architectural Principles
+
+## Modular Monolith First
+
+PulseHub intentionally starts as a **modular monolith**.
+
+Modules are clearly separated into:
+
+- Api
+- Business
+- Contracts
+- Dal
+- Domain
+- Mapping
+
+Microservices should only be introduced when clear module boundaries exist.
+
+---
+
+## Clean Layering
+
+```text
+API
+ ↓
+Business
+ ↓
+DAL
+ ↓
+Database
+```
+
+The Business layer never depends on ASP.NET Core.
+
+---
+
+## DTOs Everywhere
+
+Controllers never expose Entity Framework entities.
+
+All communication happens through **Contracts (DTOs)**.
+
+---
+
+## Repository Pattern
+
+Database access is isolated from business logic.
+
+Repositories are responsible only for persistence.
+
+---
+
+## Business Layer
+
+Business rules belong inside **Managers**.
+
+Examples:
+
+- Reservation status transitions
+- Guest validation
+- Duplicate reservation detection
+- Property validation
+
+---
+
+# Current Features
+
+- JWT Authentication
+- Role-based Authorization
+- Policy-based Authorization
+- Property CRUD
+- Guest CRUD
+- Reservation CRUD
+- Reservation Status Workflow
+- EF Core Migrations
+- Swagger Integration
+- SQL Server
+- Central Package Management
+
+---
+
+# Planned Roadmap
+
+## Phase 1 ✅
+
+- Solution architecture
+- Property CRUD
+- Reservation CRUD
+- Guest CRUD
+
+---
+
+## Phase 2
+
+### Source Integrations
+
+- Mock Source
+- CSV Import
+- JSON Import
+
+---
+
+## Phase 3
+
+### Background Synchronization
+
+- HostedService
+- Source Scheduler
+- Reservation Import
+
+---
+
+## Phase 4
+
+### SignalR
+
+Real-time reservation updates.
+
+---
+
+## Phase 5
+
+### Webhooks
+
+- Idempotency
+- Event History
+- Retry Handling
+
+---
+
+## Phase 6
+
+### Testing
+
+- Unit Tests
+- Integration Tests
+- API Tests
+
+---
+
+## Phase 7
+
+### Identity
+
+- Keycloak
+- OAuth 2.0
+- OpenID Connect
+- Refresh Tokens
+
+---
+
+## Phase 8
+
+### Apaleo Sandbox
+
+Synchronize reservations against a real PMS.
+
+---
+
+## Phase 9
+
+### Messaging
+
+- RabbitMQ
+- Outbox Pattern
+- Background Processing
+
+---
+
+## Phase 10
+
+### Cloud
+
+- Docker
+- Docker Compose
+- Azure
+- CI/CD
+- Kubernetes (optional)
+
+---
+
+# Long-Term Vision
+
+PulseHub is not intended to be just another CRUD application.
+
+The goal is to build a production-style backend demonstrating modern .NET engineering practices:
+
+- Clean Architecture
+- Modular Monolith
+- Background Processing
+- External Integrations
+- Authentication & Authorization
+- Event-Driven Communication
+- Real-Time Updates
+- Cloud-Native Deployment
+
+The project should resemble the architecture used by modern hospitality platforms such as **Apaleo**, while remaining simple enough to understand, extend, and showcase during technical interviews.
