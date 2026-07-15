@@ -1,5 +1,6 @@
 using PulseHub.Contracts.Reservations;
 using PulseHub.Domain.Models;
+using PulseHub.Mapping.Guests;
 
 namespace PulseHub.Mapping.Reservations;
 
@@ -11,7 +12,7 @@ public static class ReservationMapper
         return new Reservation
         {
             ExternalId = request.ExternalId.Trim(),
-            GuestName = request.GuestName.Trim(),
+            GuestId = request.GuestId,
             ArrivalDate = request.ArrivalDate,
             DepartureDate = request.DepartureDate,
             PropertyId = request.PropertyId,
@@ -24,23 +25,24 @@ public static class ReservationMapper
         UpdateReservationRequest request,
         Reservation reservation)
     {
-        reservation.GuestName = request.GuestName.Trim();
+        reservation.GuestId = request.GuestId;
         reservation.ArrivalDate = request.ArrivalDate;
         reservation.DepartureDate = request.DepartureDate;
         reservation.PropertyId = request.PropertyId;
     }
 
-    public static ReservationResponse ToResponse(Reservation reservation)
+    public static ReservationResponse ToResponse(
+        Reservation reservation)
     {
         return new ReservationResponse(
             reservation.Id,
             reservation.ExternalId,
-            reservation.GuestName,
             reservation.ArrivalDate,
             reservation.DepartureDate,
             ToContract(reservation.Status),
             reservation.PropertyId,
             reservation.Property.Name,
+            GuestMapper.ToResponse(reservation.Guest),
             reservation.CreatedAtUtc);
     }
     

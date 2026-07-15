@@ -6,8 +6,10 @@ public class Reservation
 
     public string ExternalId { get; set; } = string.Empty;
 
-    public string GuestName { get; set; } = string.Empty;
+    public int GuestId { get; set; }
 
+    public Guest Guest { get; set; } = null!;
+    
     public DateOnly ArrivalDate { get; set; }
 
     public DateOnly DepartureDate { get; set; }

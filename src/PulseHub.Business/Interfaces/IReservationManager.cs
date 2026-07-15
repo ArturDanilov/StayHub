@@ -12,7 +12,7 @@ public interface IReservationManager
         int id,
         CancellationToken cancellationToken = default);
 
-    Task<OperationResult<ReservationResponse>> CreateAsync(
+    Task<OperationResult<ReservationResponse, ReservationError>> CreateAsync(
         CreateReservationRequest request,
         CancellationToken cancellationToken = default);
 

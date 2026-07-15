@@ -1,14 +1,13 @@
 namespace PulseHub.Business.Results;
 
-public sealed record OperationResult<T>(
-    T? Value,
-    ReservationError Error)
+public sealed record OperationResult<TValue, TError>(
+    TValue? Value,
+    TError Error,
+    bool IsSuccess)
 {
-    public bool IsSuccess => Error == ReservationError.None;
+    public static OperationResult<TValue, TError> Success(TValue value)
+        => new(value, default!, true);
 
-    public static OperationResult<T> Success(T value)
-        => new(value, ReservationError.None);
-
-    public static OperationResult<T> Failure(ReservationError error)
-        => new(default, error);
+    public static OperationResult<TValue, TError> Failure(TError error)
+        => new(default, error, false);
 }

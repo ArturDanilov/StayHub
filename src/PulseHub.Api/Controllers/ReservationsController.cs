@@ -117,6 +117,9 @@ public sealed class ReservationsController(
             ReservationError.ReservationNotFound =>
                 NotFound("Reservation not found."),
 
+            ReservationError.GuestNotFound =>
+                BadRequest("Guest not found."),
+            
             ReservationError.PropertyNotFound =>
                 BadRequest("Property not found."),
 

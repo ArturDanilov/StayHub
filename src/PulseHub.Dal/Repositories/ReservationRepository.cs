@@ -14,6 +14,7 @@ public sealed class ReservationRepository(PulseHubDbContext dbContext)
         return await dbContext.Reservations
             .AsNoTracking()
             .Include(x => x.Property)
+            .Include(x => x.Guest)
             .OrderBy(x => x.ArrivalDate)
             .ToListAsync(cancellationToken);
     }
@@ -24,6 +25,7 @@ public sealed class ReservationRepository(PulseHubDbContext dbContext)
     {
         return dbContext.Reservations
             .Include(x => x.Property)
+            .Include(x => x.Guest)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 

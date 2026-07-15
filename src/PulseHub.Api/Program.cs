@@ -49,6 +49,9 @@ builder.Services.AddScoped<IReservationManager, ReservationManager>();
 builder.Services.AddScoped<ISourceRepository, SourceRepository>();
 builder.Services.AddScoped<ISourceManager, SourceManager>();
 
+builder.Services.AddScoped<IGuestRepository, GuestRepository>();
+builder.Services.AddScoped<IGuestManager, GuestManager>();
+
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 var jwtOptions = builder.Configuration

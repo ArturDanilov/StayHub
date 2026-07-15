@@ -8,7 +8,8 @@ namespace PulseHub.Business.Managers;
 
 public sealed class ReservationManager(
     IReservationRepository reservationRepository,
-    IPropertyRepository propertyRepository)
+    IPropertyRepository propertyRepository,
+    IGuestRepository guestRepository)
     : IReservationManager
 {
     public async Task<IReadOnlyList<ReservationResponse>> GetAllAsync(
@@ -36,7 +37,7 @@ public sealed class ReservationManager(
             : ReservationMapper.ToResponse(reservation);
     }
 
-    public async Task<OperationResult<ReservationResponse>> CreateAsync(
+    public async Task<OperationResult<ReservationResponse, ReservationError>> CreateAsync(
         CreateReservationRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -44,7 +45,7 @@ public sealed class ReservationManager(
                 request.ArrivalDate,
                 request.DepartureDate))
         {
-            return OperationResult<ReservationResponse>.Failure(
+            return OperationResult<ReservationResponse, ReservationError>.Failure(
                 ReservationError.InvalidDateRange);
         }
 
@@ -54,8 +55,18 @@ public sealed class ReservationManager(
 
         if (property is null)
         {
-            return OperationResult<ReservationResponse>.Failure(
-                ReservationError.PropertyNotFound);
+            return OperationResult<ReservationResponse, ReservationError>.Failure(
+                ReservationError.InvalidDateRange);
+        }
+
+        var guest = await guestRepository.GetByIdAsync(
+            request.GuestId,
+            cancellationToken);
+
+        if (guest is null)
+        {
+            return OperationResult<ReservationResponse, ReservationError>.Failure(
+                ReservationError.InvalidDateRange);
         }
 
         var externalIdExists =
@@ -65,18 +76,20 @@ public sealed class ReservationManager(
 
         if (externalIdExists)
         {
-            return OperationResult<ReservationResponse>.Failure(
-                ReservationError.ExternalIdAlreadyExists);
+            return OperationResult<ReservationResponse, ReservationError>.Failure(
+                ReservationError.InvalidDateRange);
         }
 
         var reservation = ReservationMapper.ToDomain(request);
+
         reservation.Property = property;
+        reservation.Guest = guest;
 
         var created = await reservationRepository.AddAsync(
             reservation,
             cancellationToken);
 
-        return OperationResult<ReservationResponse>.Success(
+        return OperationResult<ReservationResponse, ReservationError>.Success(
             ReservationMapper.ToResponse(created));
     }
 
@@ -107,8 +120,17 @@ public sealed class ReservationManager(
         if (property is null)
             return ReservationError.PropertyNotFound;
 
+        var guest = await guestRepository.GetByIdAsync(
+            request.GuestId,
+            cancellationToken);
+
+        if (guest is null)
+            return ReservationError.GuestNotFound;
+
         ReservationMapper.MapToDomain(request, reservation);
+
         reservation.Property = property;
+        reservation.Guest = guest;
 
         await reservationRepository.SaveChangesAsync(
             cancellationToken);
