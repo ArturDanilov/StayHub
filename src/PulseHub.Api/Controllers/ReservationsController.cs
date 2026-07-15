@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PulseHub.Api.Constants;
+using PulseHub.Api.Common;
 using PulseHub.Business.Interfaces;
 using PulseHub.Business.Results;
 using PulseHub.Contracts.Reservations;
@@ -15,6 +15,7 @@ public sealed class ReservationsController(
     : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
     public async Task<ActionResult<IReadOnlyList<ReservationResponse>>> GetAll(
         CancellationToken cancellationToken)
     {
@@ -25,6 +26,7 @@ public sealed class ReservationsController(
     }
 
     [HttpGet(ApiRoutes.Reservations.ById)]
+    [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
     public async Task<ActionResult<ReservationResponse>> GetById(
         int id,
         CancellationToken cancellationToken)
@@ -38,6 +40,7 @@ public sealed class ReservationsController(
     }
 
     [HttpPost]
+    [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
     public async Task<ActionResult<ReservationResponse>> Create(
         CreateReservationRequest request,
         CancellationToken cancellationToken)
@@ -57,6 +60,7 @@ public sealed class ReservationsController(
     }
 
     [HttpPut(ApiRoutes.Reservations.ById)]
+    [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
     public async Task<IActionResult> Update(
         int id,
         UpdateReservationRequest request,
@@ -74,6 +78,7 @@ public sealed class ReservationsController(
     }
 
     [HttpPatch(ApiRoutes.Reservations.Status)]
+    [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
     public async Task<IActionResult> UpdateStatus(
         int id,
         UpdateReservationStatusRequest request,
@@ -91,12 +96,12 @@ public sealed class ReservationsController(
     }
 
     [HttpDelete(ApiRoutes.Reservations.ById)]
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     public async Task<IActionResult> Delete(
         int id,
         CancellationToken cancellationToken)
     {
-        var deleted =
-            await reservationManager.DeleteAsync(
+        var deleted = await reservationManager.DeleteAsync(
                 id,
                 cancellationToken);
 

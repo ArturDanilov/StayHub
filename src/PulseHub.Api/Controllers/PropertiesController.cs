@@ -1,16 +1,19 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PulseHub.Api.Constants;
+using PulseHub.Api.Common;
 using PulseHub.Business.Interfaces;
 using PulseHub.Contracts.Properties;
 
 namespace PulseHub.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route(ApiRoutes.Properties.Base)]
 public sealed class PropertiesController(IPropertyManager propertyManager)
     : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
     public async Task<ActionResult<IReadOnlyList<PropertyResponse>>> GetAll(
         CancellationToken cancellationToken)
     {
@@ -20,6 +23,7 @@ public sealed class PropertiesController(IPropertyManager propertyManager)
     }
 
     [HttpGet(ApiRoutes.Properties.ById)]
+    [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
     public async Task<ActionResult<PropertyResponse>> GetById(
         int id,
         CancellationToken cancellationToken)
@@ -35,6 +39,7 @@ public sealed class PropertiesController(IPropertyManager propertyManager)
     }
 
     [HttpPost]
+    [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
     public async Task<ActionResult<PropertyResponse>> Create(
         CreatePropertyRequest request,
         CancellationToken cancellationToken)
@@ -50,6 +55,7 @@ public sealed class PropertiesController(IPropertyManager propertyManager)
     }
 
     [HttpPut(ApiRoutes.Properties.ById)]
+    [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
     public async Task<IActionResult> Update(
         int id,
         UpdatePropertyRequest request,
@@ -67,6 +73,7 @@ public sealed class PropertiesController(IPropertyManager propertyManager)
     }
 
     [HttpDelete(ApiRoutes.Properties.ById)]
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     public async Task<IActionResult> Delete(
         int id,
         CancellationToken cancellationToken)

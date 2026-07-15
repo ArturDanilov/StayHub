@@ -1,77 +1,86 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PulseHub.Api.Constants;
-using PulseHub.Dal.Data;
-using PulseHub.Domain.Models;
+using PulseHub.Api.Common;
+using PulseHub.Business.Interfaces;
+using PulseHub.Contracts.Sources;
 
 namespace PulseHub.Api.Controllers;
 
-[Authorize]
 [ApiController]
 [Route(ApiRoutes.Sources.Base)]
-public class SourcesController(PulseHubDbContext dbContext) : ControllerBase
+public sealed class SourcesController(ISourceManager sourceManager)
+    : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<Source>>> GetAll()
+    [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
+    public async Task<ActionResult<IReadOnlyList<SourceResponse>>> GetAll(
+        CancellationToken cancellationToken)
     {
-        return await dbContext.Sources
-            .OrderBy(x => x.Name)
-            .ToListAsync();
+        var sources = await sourceManager.GetAllAsync(cancellationToken);
+
+        return Ok(sources);
     }
 
     [HttpGet(ApiRoutes.Sources.ById)]
-    public async Task<ActionResult<Source>> GetById(int id)
+    [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
+    public async Task<ActionResult<SourceResponse>> GetById(
+        int id,
+        CancellationToken cancellationToken)
     {
-        var source = await dbContext.Sources.FindAsync(id);
+        var source = await sourceManager.GetByIdAsync(
+            id,
+            cancellationToken);
 
-        if (source is null)
-            return NotFound();
-
-        return source;
+        return source is null
+            ? NotFound()
+            : Ok(source);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Source>> Create(Source source)
+    [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
+    public async Task<ActionResult<SourceResponse>> Create(
+        CreateSourceRequest request,
+        CancellationToken cancellationToken)
     {
-        source.Id = 0;
-        source.CreatedAtUtc = DateTime.UtcNow;
+        var source = await sourceManager.CreateAsync(
+            request,
+            cancellationToken);
 
-        dbContext.Sources.Add(source);
-        await dbContext.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetById), new { id = source.Id }, source);
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = source.Id },
+            source);
     }
 
     [HttpPut(ApiRoutes.Sources.ById)]
-    public async Task<IActionResult> Update(int id, Source source)
+    [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
+    public async Task<IActionResult> Update(
+        int id,
+        UpdateSourceRequest request,
+        CancellationToken cancellationToken)
     {
-        var existingSource = await dbContext.Sources.FindAsync(id);
+        var updated = await sourceManager.UpdateAsync(
+            id,
+            request,
+            cancellationToken);
 
-        if (existingSource is null)
-            return NotFound();
-
-        existingSource.Name = source.Name;
-        existingSource.SourceType = source.SourceType;
-        existingSource.Url = source.Url;
-        existingSource.IsEnabled = source.IsEnabled;
-
-        await dbContext.SaveChangesAsync();
-
-        return NoContent();
+        return updated
+            ? NoContent()
+            : NotFound();
     }
 
     [HttpDelete(ApiRoutes.Sources.ById)]
-    public async Task<IActionResult> Delete(int id)
+    [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
+    public async Task<IActionResult> Delete(
+        int id,
+        CancellationToken cancellationToken)
     {
-        var source = await dbContext.Sources.FindAsync(id);
+        var deleted = await sourceManager.DeleteAsync(
+            id,
+            cancellationToken);
 
-        if (source is null)
-            return NotFound();
-
-        dbContext.Sources.Remove(source);
-        await dbContext.SaveChangesAsync();
-
-        return NoContent();
+        return deleted
+            ? NoContent()
+            : NotFound();
     }
 }

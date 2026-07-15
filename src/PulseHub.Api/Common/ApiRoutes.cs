@@ -1,8 +1,8 @@
-namespace PulseHub.Api.Constants;
+namespace PulseHub.Api.Common;
 
 public class ApiRoutes
 {
-    public const string Api = "api";
+    private const string Api = "api";
 
     public static class Authentication
     {

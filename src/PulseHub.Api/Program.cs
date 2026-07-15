@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using PulseHub.Api.Authentication;
+using PulseHub.Api.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,8 +42,13 @@ builder.Services.AddDbContext<PulseHubDbContext>(options =>
 
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IPropertyManager, PropertyManager>();
+
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationManager, ReservationManager>();
+
+builder.Services.AddScoped<ISourceRepository, SourceRepository>();
+builder.Services.AddScoped<ISourceManager, SourceManager>();
+
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 var jwtOptions = builder.Configuration
@@ -74,8 +80,25 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(
+        AuthorizationPolicies.ReadAccess,
+        policy => policy.RequireRole(
+            AppRoles.Admin,
+            AppRoles.Receptionist,
+            AppRoles.Viewer));
 
+    options.AddPolicy(
+        AuthorizationPolicies.ManageReservations,
+        policy => policy.RequireRole(
+            AppRoles.Admin,
+            AppRoles.Receptionist));
+
+    options.AddPolicy(
+        AuthorizationPolicies.AdminOnly,
+        policy => policy.RequireRole(AppRoles.Admin));
+});
 var app = builder.Build();
 
 app.UseAuthentication();
