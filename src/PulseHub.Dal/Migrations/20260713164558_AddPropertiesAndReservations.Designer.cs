@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PulseHub.Dal.Data;
 
@@ -11,9 +12,11 @@ using PulseHub.Dal.Data;
 namespace PulseHub.Dal.Migrations
 {
     [DbContext(typeof(PulseHubDbContext))]
-    partial class PulseHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260713164558_AddPropertiesAndReservations")]
+    partial class AddPropertiesAndReservations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,44 +24,6 @@ namespace PulseHub.Dal.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("PulseHub.Domain.Models.Guest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.ToTable("Guests");
-                });
 
             modelBuilder.Entity("PulseHub.Domain.Models.Property", b =>
                 {
@@ -113,8 +78,10 @@ namespace PulseHub.Dal.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("GuestId")
-                        .HasColumnType("int");
+                    b.Property<string>("GuestName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("PropertyId")
                         .HasColumnType("int");
@@ -126,8 +93,6 @@ namespace PulseHub.Dal.Migrations
 
                     b.HasIndex("ExternalId")
                         .IsUnique();
-
-                    b.HasIndex("GuestId");
 
                     b.HasIndex("PropertyId");
 
@@ -169,26 +134,13 @@ namespace PulseHub.Dal.Migrations
 
             modelBuilder.Entity("PulseHub.Domain.Models.Reservation", b =>
                 {
-                    b.HasOne("PulseHub.Domain.Models.Guest", "Guest")
-                        .WithMany("Reservations")
-                        .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("PulseHub.Domain.Models.Property", "Property")
                         .WithMany("Reservations")
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Guest");
-
                     b.Navigation("Property");
-                });
-
-            modelBuilder.Entity("PulseHub.Domain.Models.Guest", b =>
-                {
-                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("PulseHub.Domain.Models.Property", b =>

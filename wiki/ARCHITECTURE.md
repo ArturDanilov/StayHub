@@ -130,3 +130,39 @@ Avoid unnecessary abstractions
 The project should not introduce patterns only for the sake of using patterns.
 
 Every abstraction should solve a real problem.
+
+# Roadmap
+
+```text
+Phase 1
+Property + Reservation CRUD
+
+Phase 2
+DTOs + custom mapper + repository + manager
+
+Phase 3
+Mock reservation webhook
+
+Phase 4
+Webhook idempotency and event history
+
+Phase 5
+SignalR live reservation updates
+
+Phase 6
+Integration and API tests
+
+Phase 7
+OAuth 2.0 / OpenID Connect
+
+Phase 8
+Connect to an Apaleo sandbox
+
+Phase 9
+Background processing and message broker
+
+Phase 10
+Payments or check-in integration
+
+```
+

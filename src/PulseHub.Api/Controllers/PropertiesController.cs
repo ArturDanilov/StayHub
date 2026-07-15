@@ -2,85 +2,89 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PulseHub.Api.Common;
 using PulseHub.Business.Interfaces;
-using PulseHub.Contracts.Sources;
+using PulseHub.Contracts.Properties;
 
 namespace PulseHub.Api.Controllers;
 
+[Authorize]
 [ApiController]
-[Route(ApiRoutes.Sources.Base)]
-public sealed class SourcesController(ISourceManager sourceManager)
+[Route(ApiRoutes.Properties.Base)]
+public sealed class PropertiesController(IPropertyManager propertyManager)
     : ControllerBase
 {
     [HttpGet]
     [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
-    public async Task<ActionResult<IReadOnlyList<SourceResponse>>> GetAll(
+    public async Task<ActionResult<IReadOnlyList<PropertyResponse>>> GetAll(
         CancellationToken cancellationToken)
     {
-        var sources = await sourceManager.GetAllAsync(cancellationToken);
+        var properties = await propertyManager.GetAllAsync(cancellationToken);
 
-        return Ok(sources);
+        return Ok(properties);
     }
 
-    [HttpGet(ApiRoutes.Sources.ById)]
+    [HttpGet(ApiRoutes.Properties.ById)]
     [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
-    public async Task<ActionResult<SourceResponse>> GetById(
+    public async Task<ActionResult<PropertyResponse>> GetById(
         int id,
         CancellationToken cancellationToken)
     {
-        var source = await sourceManager.GetByIdAsync(
+        var property = await propertyManager.GetByIdAsync(
             id,
             cancellationToken);
 
-        return source is null
-            ? NotFound()
-            : Ok(source);
+        if (property is null)
+            return NotFound();
+
+        return Ok(property);
     }
 
     [HttpPost]
     [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
-    public async Task<ActionResult<SourceResponse>> Create(
-        CreateSourceRequest request,
+    public async Task<ActionResult<PropertyResponse>> Create(
+        CreatePropertyRequest request,
         CancellationToken cancellationToken)
     {
-        var source = await sourceManager.CreateAsync(
+        var property = await propertyManager.CreateAsync(
             request,
             cancellationToken);
 
         return CreatedAtAction(
             nameof(GetById),
-            new { id = source.Id },
-            source);
+            new { id = property.Id },
+            property);
     }
 
-    [HttpPut(ApiRoutes.Sources.ById)]
+    [HttpPut(ApiRoutes.Properties.ById)]
     [Authorize(Policy = AuthorizationPolicies.ManageReservations)]
     public async Task<IActionResult> Update(
         int id,
-        UpdateSourceRequest request,
+        UpdatePropertyRequest request,
         CancellationToken cancellationToken)
     {
-        var updated = await sourceManager.UpdateAsync(
+        var updated = await propertyManager.UpdateAsync(
             id,
             request,
             cancellationToken);
 
-        return updated
-            ? NoContent()
-            : NotFound();
+        if (!updated)
+            return NotFound();
+
+        return NoContent();
     }
 
-    [HttpDelete(ApiRoutes.Sources.ById)]
+    [HttpDelete(ApiRoutes.Properties.ById)]
     [Authorize(Policy = AuthorizationPolicies.AdminOnly)]
     public async Task<IActionResult> Delete(
         int id,
         CancellationToken cancellationToken)
     {
-        var deleted = await sourceManager.DeleteAsync(
+        var deleted = await propertyManager.DeleteAsync(
             id,
             cancellationToken);
 
-        return deleted
-            ? NoContent()
-            : NotFound();
+        if (!deleted)
+            return NotFound();
+
+        return NoContent();
     }
 }
