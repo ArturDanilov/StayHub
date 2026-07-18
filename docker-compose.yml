@@ -5,7 +5,7 @@ services:
     container_name: pulsehub-sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "PulseHub_Dev123!"
+      MSSQL_SA_PASSWORD: "StayHub_Dev123!"
       MSSQL_PID: "Developer"
     ports:
       - "1433:1433"

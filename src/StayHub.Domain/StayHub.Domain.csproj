@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>StayHub.Domain</RootNamespace>
+  </PropertyGroup>
+</Project>
