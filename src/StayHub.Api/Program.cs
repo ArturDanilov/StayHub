@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using StayHub.Api.Authentication;
 using StayHub.Api.Common;
+using StayHub.Api.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +104,11 @@ builder.Services.AddAuthorization(options =>
         policy => policy.RequireRole(AppRoles.Admin));
 });
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    await DatabaseSeeder.SeedAsync(app.Services);
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
