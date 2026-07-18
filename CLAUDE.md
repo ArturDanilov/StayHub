@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-PulseHub is a telemetry platform for collecting, normalizing, storing and visualizing data from
+StayHub is a telemetry platform for collecting, normalizing, storing and visualizing data from
 heterogeneous sources (mock sensors, weather APIs, smart home devices, later MQTT/Home Assistant).
 It is an early-stage .NET 10 modular monolith — most projects are still empty scaffolding
 (`Class1.cs` stubs). See `wiki/ARCHITECTURE.md` for the full design doc; the key points are
@@ -36,19 +36,19 @@ Source -> Collector -> Parser -> Normalizer -> Measurement -> Database -> API ->
 
 ## Solution layout
 
-`PulseHub.sln` wires together these projects (dependencies flow downward):
+`StayHub.sln` wires together these projects (dependencies flow downward):
 
 ```
-PulseHub.Api        ASP.NET Core Web API (controllers, DI, Swagger). Depends on Dal.
-PulseHub.Business   Business/domain logic (currently empty stub).
-PulseHub.Contracts  DTOs/contracts shared across layers (currently empty stub).
-PulseHub.Mapping    Mapping between Domain models and Contracts (currently empty stub). Depends on Domain, Contracts.
-PulseHub.Domain     Domain models (e.g. Source). No dependencies.
-PulseHub.Dal        EF Core DbContext + migrations, SQL Server. Depends on Domain.
+StayHub.Api        ASP.NET Core Web API (controllers, DI, Swagger). Depends on Dal.
+StayHub.Business   Business/domain logic (currently empty stub).
+StayHub.Contracts  DTOs/contracts shared across layers (currently empty stub).
+StayHub.Mapping    Mapping between Domain models and Contracts (currently empty stub). Depends on Domain, Contracts.
+StayHub.Domain     Domain models (e.g. Source). No dependencies.
+StayHub.Dal        EF Core DbContext + migrations, SQL Server. Depends on Domain.
 ```
 
-Note the current API controllers (e.g. `SourcesController`) talk to `PulseHubDbContext` directly
-and return `PulseHub.Domain.Models` types straight over the wire — the Business/Contracts/Mapping
+Note the current API controllers (e.g. `SourcesController`) talk to `StayHubDbContext` directly
+and return `StayHub.Domain.Models` types straight over the wire — the Business/Contracts/Mapping
 layers exist in the solution but aren't wired in yet. When adding features, prefer following
 existing conventions in the repo over what the layer names imply until this settles.
 
@@ -65,11 +65,11 @@ docker compose up -d
 # Restore, build, run
 dotnet restore
 dotnet build
-dotnet run --project src/PulseHub.Api          # serves API + Swagger UI at /swagger in Development
+dotnet run --project src/StayHub.Api          # serves API + Swagger UI at /swagger in Development
 
 # EF Core migrations (run from repo root, targeting the Dal project, startup project is Api)
-dotnet ef migrations add <Name> --project src/PulseHub.Dal --startup-project src/PulseHub.Api
-dotnet ef database update --project src/PulseHub.Dal --startup-project src/PulseHub.Api
+dotnet ef migrations add <Name> --project src/StayHub.Dal --startup-project src/StayHub.Api
+dotnet ef database update --project src/StayHub.Dal --startup-project src/StayHub.Api
 
 # Tests
 dotnet test
@@ -79,6 +79,6 @@ The `tests/` directory currently exists but is empty — no test project has bee
 
 ## Local database
 
-`docker-compose.yml` runs SQL Server 2022 on `localhost:1433` (container `pulsehub-sqlserver`).
-Credentials and the `PulseHubDb` connection string are in
-`src/PulseHub.Api/appsettings.Development.json` (dev-only, matches the docker-compose password).
+`docker-compose.yml` runs SQL Server 2022 on `localhost:1433` (container `StayHub-sqlserver`).
+Credentials and the `StayHubDb` connection string are in
+`src/StayHub.Api/appsettings.Development.json` (dev-only, matches the docker-compose password).

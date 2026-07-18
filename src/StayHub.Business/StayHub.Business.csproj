@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>StayHub.Business</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\StayHub.Domain\StayHub.Domain.csproj" />
+    <ProjectReference Include="..\StayHub.Contracts\StayHub.Contracts.csproj" />
+    <ProjectReference Include="..\StayHub.Mapping\StayHub.Mapping.csproj" />
+  </ItemGroup>
+</Project>

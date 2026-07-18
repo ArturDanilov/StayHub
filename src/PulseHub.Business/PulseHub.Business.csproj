@@ -1,7 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\PulseHub.Domain\PulseHub.Domain.csproj" />
-    <ProjectReference Include="..\PulseHub.Contracts\PulseHub.Contracts.csproj" />
-    <ProjectReference Include="..\PulseHub.Mapping\PulseHub.Mapping.csproj" />
-  </ItemGroup>
-</Project>
