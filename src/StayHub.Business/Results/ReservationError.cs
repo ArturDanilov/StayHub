@@ -6,6 +6,7 @@ public enum ReservationError
     ReservationNotFound,
     PropertyNotFound,
     GuestNotFound,
+    SourceNotFound,
     ExternalIdAlreadyExists,
     InvalidDateRange,
     InvalidStatusTransition

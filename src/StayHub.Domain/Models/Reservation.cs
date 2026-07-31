@@ -6,6 +6,10 @@ public class Reservation
 
     public string ExternalId { get; set; } = string.Empty;
 
+    public int SourceId { get; set; }
+
+    public Source Source { get; set; } = null!;
+
     public int GuestId { get; set; }
 
     public Guest Guest { get; set; } = null!;

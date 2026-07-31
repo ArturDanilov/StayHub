@@ -56,8 +56,13 @@ public class StayHubDbContext(DbContextOptions<StayHubDbContext> options) : DbCo
                 .IsRequired()
                 .HasMaxLength(100);
 
-            entity.HasIndex(x => x.ExternalId)
+            entity.HasIndex(x => new { x.SourceId, x.ExternalId })
                 .IsUnique();
+
+            entity.HasOne(x => x.Source)
+                .WithMany(x => x.Reservations)
+                .HasForeignKey(x => x.SourceId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(x => x.Guest)
                 .WithMany(x => x.Reservations)

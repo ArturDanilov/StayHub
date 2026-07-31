@@ -123,6 +123,9 @@ public sealed class ReservationsController(
             ReservationError.PropertyNotFound =>
                 BadRequest("Property not found."),
 
+            ReservationError.SourceNotFound =>
+                BadRequest("Source not found."),
+
             ReservationError.ExternalIdAlreadyExists =>
                 Conflict("A reservation with this external ID already exists."),
 

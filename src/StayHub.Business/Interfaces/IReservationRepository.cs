@@ -12,6 +12,7 @@ public interface IReservationRepository
         CancellationToken cancellationToken = default);
 
     Task<bool> ExternalIdExistsAsync(
+        int sourceId,
         string externalId,
         CancellationToken cancellationToken = default);
 
