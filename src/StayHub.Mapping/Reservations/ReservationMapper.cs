@@ -12,6 +12,7 @@ public static class ReservationMapper
         return new Reservation
         {
             ExternalId = request.ExternalId.Trim(),
+            SourceId = request.SourceId,
             GuestId = request.GuestId,
             ArrivalDate = request.ArrivalDate,
             DepartureDate = request.DepartureDate,
@@ -37,6 +38,8 @@ public static class ReservationMapper
         return new ReservationResponse(
             reservation.Id,
             reservation.ExternalId,
+            reservation.SourceId,
+            reservation.Source.Name,
             reservation.ArrivalDate,
             reservation.DepartureDate,
             ToContract(reservation.Status),

@@ -13,4 +13,6 @@ public class Source
     public bool IsEnabled { get; set; } = true;
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public ICollection<Reservation> Reservations { get; set; } = [];
 }

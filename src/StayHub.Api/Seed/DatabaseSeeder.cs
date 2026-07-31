@@ -20,8 +20,8 @@ public static class DatabaseSeeder
         if (await db.Properties.AnyAsync(cancellationToken))
             return;
 
-        var now = DateTime.UtcNow;
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var createdAtUtc = new DateTime(2026, 7, 1, 12, 0, 0, DateTimeKind.Utc);
+        var referenceDate = new DateOnly(2026, 7, 15);
 
         #region Properties
 
@@ -32,21 +32,21 @@ public static class DatabaseSeeder
                 Name = "StayHub Munich Central",
                 City = "Munich",
                 CountryCode = "DE",
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
                 Name = "StayHub Berlin Mitte",
                 City = "Berlin",
                 CountryCode = "DE",
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
                 Name = "StayHub Lake Resort",
                 City = "Rottach-Egern",
                 CountryCode = "DE",
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             }
         };
 
@@ -64,7 +64,7 @@ public static class DatabaseSeeder
                 LastName = "Müller",
                 Email = "anna.mueller@example.com",
                 Phone = "+49 151 11111111",
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
@@ -72,7 +72,7 @@ public static class DatabaseSeeder
                 LastName = "Schneider",
                 Email = "lukas.schneider@example.com",
                 Phone = "+49 151 22222222",
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
@@ -80,7 +80,7 @@ public static class DatabaseSeeder
                 LastName = "Weber",
                 Email = "sophie.weber@example.com",
                 Phone = "+49 151 33333333",
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
@@ -88,7 +88,7 @@ public static class DatabaseSeeder
                 LastName = "Smith",
                 Email = "john.smith@example.com",
                 Phone = "+1 555 123456",
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
@@ -96,7 +96,7 @@ public static class DatabaseSeeder
                 LastName = "Johnson",
                 Email = "emily.johnson@example.com",
                 Phone = "+1 555 987654",
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             }
         };
 
@@ -114,7 +114,7 @@ public static class DatabaseSeeder
                 SourceType = "OTA",
                 Url = "https://booking.com",
                 IsEnabled = true,
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
@@ -122,14 +122,22 @@ public static class DatabaseSeeder
                 SourceType = "PMS",
                 Url = "https://apaleo.com",
                 IsEnabled = true,
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
                 Name = "Manual Import",
                 SourceType = "Manual",
                 IsEnabled = true,
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                Name = "Mock PMS",
+                SourceType = "PMS",
+                Url = "https://mock-pms.local",
+                IsEnabled = true,
+                CreatedAtUtc = createdAtUtc
             }
         };
 
@@ -145,53 +153,58 @@ public static class DatabaseSeeder
         {
             new()
             {
-                ExternalId = Guid.NewGuid().ToString("N"),
+                ExternalId = "BOOKING-1001",
+                SourceId = sources[0].Id,
                 GuestId = guests[0].Id,
                 PropertyId = properties[0].Id,
-                ArrivalDate = today.AddDays(2),
-                DepartureDate = today.AddDays(5),
+                ArrivalDate = referenceDate.AddDays(2),
+                DepartureDate = referenceDate.AddDays(5),
                 Status = ReservationStatus.Confirmed,
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
-                ExternalId = Guid.NewGuid().ToString("N"),
+                ExternalId = "APALEO-1001",
+                SourceId = sources[1].Id,
                 GuestId = guests[1].Id,
                 PropertyId = properties[0].Id,
-                ArrivalDate = today,
-                DepartureDate = today.AddDays(4),
+                ArrivalDate = referenceDate,
+                DepartureDate = referenceDate.AddDays(4),
                 Status = ReservationStatus.CheckedIn,
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
-                ExternalId = Guid.NewGuid().ToString("N"),
+                ExternalId = "MANUAL-1001",
+                SourceId = sources[2].Id,
                 GuestId = guests[2].Id,
                 PropertyId = properties[1].Id,
-                ArrivalDate = today.AddDays(-7),
-                DepartureDate = today.AddDays(-3),
+                ArrivalDate = referenceDate.AddDays(-7),
+                DepartureDate = referenceDate.AddDays(-3),
                 Status = ReservationStatus.CheckedOut,
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
-                ExternalId = Guid.NewGuid().ToString("N"),
+                ExternalId = "MOCK-1001",
+                SourceId = sources[3].Id,
                 GuestId = guests[3].Id,
                 PropertyId = properties[2].Id,
-                ArrivalDate = today.AddDays(10),
-                DepartureDate = today.AddDays(14),
+                ArrivalDate = referenceDate.AddDays(10),
+                DepartureDate = referenceDate.AddDays(14),
                 Status = ReservationStatus.Confirmed,
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             },
             new()
             {
-                ExternalId = Guid.NewGuid().ToString("N"),
+                ExternalId = "MOCK-1002",
+                SourceId = sources[3].Id,
                 GuestId = guests[4].Id,
                 PropertyId = properties[1].Id,
-                ArrivalDate = today.AddDays(20),
-                DepartureDate = today.AddDays(23),
+                ArrivalDate = referenceDate.AddDays(20),
+                DepartureDate = referenceDate.AddDays(23),
                 Status = ReservationStatus.Cancelled,
-                CreatedAtUtc = now
+                CreatedAtUtc = createdAtUtc
             }
         };
 

@@ -9,7 +9,8 @@ namespace StayHub.Business.Managers;
 public sealed class ReservationManager(
     IReservationRepository reservationRepository,
     IPropertyRepository propertyRepository,
-    IGuestRepository guestRepository)
+    IGuestRepository guestRepository,
+    ISourceRepository sourceRepository)
     : IReservationManager
 {
     public async Task<IReadOnlyList<ReservationResponse>> GetAllAsync(
@@ -56,7 +57,7 @@ public sealed class ReservationManager(
         if (property is null)
         {
             return OperationResult<ReservationResponse, ReservationError>.Failure(
-                ReservationError.InvalidDateRange);
+                ReservationError.PropertyNotFound);
         }
 
         var guest = await guestRepository.GetByIdAsync(
@@ -66,24 +67,36 @@ public sealed class ReservationManager(
         if (guest is null)
         {
             return OperationResult<ReservationResponse, ReservationError>.Failure(
-                ReservationError.InvalidDateRange);
+                ReservationError.GuestNotFound);
+        }
+
+        var source = await sourceRepository.GetByIdAsync(
+            request.SourceId,
+            cancellationToken);
+
+        if (source is null)
+        {
+            return OperationResult<ReservationResponse, ReservationError>.Failure(
+                ReservationError.SourceNotFound);
         }
 
         var externalIdExists =
             await reservationRepository.ExternalIdExistsAsync(
+                request.SourceId,
                 request.ExternalId.Trim(),
                 cancellationToken);
 
         if (externalIdExists)
         {
             return OperationResult<ReservationResponse, ReservationError>.Failure(
-                ReservationError.InvalidDateRange);
+                ReservationError.ExternalIdAlreadyExists);
         }
 
         var reservation = ReservationMapper.ToDomain(request);
 
         reservation.Property = property;
         reservation.Guest = guest;
+        reservation.Source = source;
 
         var created = await reservationRepository.AddAsync(
             reservation,

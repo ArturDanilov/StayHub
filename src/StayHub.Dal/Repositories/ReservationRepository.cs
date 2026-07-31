@@ -13,6 +13,7 @@ public sealed class ReservationRepository(StayHubDbContext dbContext)
     {
         return await dbContext.Reservations
             .AsNoTracking()
+            .Include(x => x.Source)
             .Include(x => x.Property)
             .Include(x => x.Guest)
             .OrderBy(x => x.ArrivalDate)
@@ -24,18 +25,20 @@ public sealed class ReservationRepository(StayHubDbContext dbContext)
         CancellationToken cancellationToken = default)
     {
         return dbContext.Reservations
+            .Include(x => x.Source)
             .Include(x => x.Property)
             .Include(x => x.Guest)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public Task<bool> ExternalIdExistsAsync(
+        int sourceId,
         string externalId,
         CancellationToken cancellationToken = default)
     {
         return dbContext.Reservations
             .AnyAsync(
-                x => x.ExternalId == externalId,
+                x => x.SourceId == sourceId && x.ExternalId == externalId,
                 cancellationToken);
     }
 
