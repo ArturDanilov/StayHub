@@ -3,12 +3,27 @@
     x:Class="StayHub.Mobile.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:StayHub.Mobile"
-    Title="StayHub.Mobile">
+    xmlns:views="clr-namespace:StayHub.Mobile.Views"
+    Title="StayHub">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <ShellContent
+            Title="Properties"
+            Icon="properties.svg"
+            ContentTemplate="{DataTemplate views:PropertiesPage}"
+            Route="Properties" />
+
+        <ShellContent
+            Title="Reservations"
+            Icon="reservations.svg"
+            ContentTemplate="{DataTemplate views:ReservationsPage}"
+            Route="Reservations" />
+
+        <ShellContent
+            Title="Assistant"
+            Icon="assistant.svg"
+            ContentTemplate="{DataTemplate views:AssistantPage}"
+            Route="Assistant" />
+    </TabBar>
 
 </Shell>

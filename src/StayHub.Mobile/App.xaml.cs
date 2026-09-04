@@ -1,5 +1,3 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
 namespace StayHub.Mobile;
 
 public partial class App : Application

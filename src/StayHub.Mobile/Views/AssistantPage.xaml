@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.AssistantPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Assistant">
+
+    <Grid Padding="20,16" RowDefinitions="Auto,*,Auto" RowSpacing="16">
+        <VerticalStackLayout Spacing="4">
+            <Label Text="StayHub Assistant" Style="{StaticResource PageTitle}" />
+            <Label Text="Your AI copilot for daily operations" Style="{StaticResource Caption}" />
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="14">
+                <Border Style="{StaticResource Card}" BackgroundColor="{StaticResource Secondary}" HorizontalOptions="Start" MaximumWidthRequest="320">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Hello! I’ll help you understand reservations, arrivals, and property activity." />
+                        <Label Text="AI integration is coming in a later stage. For now, this screen establishes the chat experience." Style="{StaticResource Caption}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="Try asking later" Style="{StaticResource SectionTitle}" Margin="0,8,0,0" />
+                <Border Style="{StaticResource Card}">
+                    <Label Text="Who is arriving tomorrow?" />
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <Label Text="Summarize this week’s occupancy." />
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <Label Text="Draft a welcome message for my next guest." />
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <Border Style="{StaticResource Card}" Padding="14,8">
+                <Entry Placeholder="Ask StayHub Assistant" IsEnabled="False" />
+            </Border>
+            <Button Grid.Column="1" Text="Send" IsEnabled="False" />
+        </Grid>
+    </Grid>
+</ContentPage>
