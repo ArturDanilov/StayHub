@@ -8,6 +8,7 @@ public sealed class AuthService(HttpClient httpClient) : IAuthService
 {
     private const string AccessTokenKey = "stayhub_access_token";
     private const string ExpiresAtKey = "stayhub_access_token_expires_at";
+    private const string RoleKey = "stayhub_user_role";
 
     public async Task LoginAsync(
         string username,
@@ -34,6 +35,7 @@ public sealed class AuthService(HttpClient httpClient) : IAuthService
 
             await SecureStorage.Default.SetAsync(AccessTokenKey, login.AccessToken);
             await SecureStorage.Default.SetAsync(ExpiresAtKey, login.ExpiresAtUtc.ToString("O"));
+            await SecureStorage.Default.SetAsync(RoleKey, role);
         }
         catch (ApiException)
         {
@@ -53,8 +55,10 @@ public sealed class AuthService(HttpClient httpClient) : IAuthService
     {
         var token = await GetAccessTokenAsync();
         var expiresAtValue = await SecureStorage.Default.GetAsync(ExpiresAtKey);
+        var role = await GetRoleAsync();
 
         return !string.IsNullOrWhiteSpace(token)
+               && !string.IsNullOrWhiteSpace(role)
                && DateTime.TryParse(expiresAtValue, null, System.Globalization.DateTimeStyles.RoundtripKind, out var expiresAt)
                && expiresAt > DateTime.UtcNow;
     }
@@ -64,10 +68,16 @@ public sealed class AuthService(HttpClient httpClient) : IAuthService
         return SecureStorage.Default.GetAsync(AccessTokenKey);
     }
 
+    public Task<string?> GetRoleAsync()
+    {
+        return SecureStorage.Default.GetAsync(RoleKey);
+    }
+
     public Task LogoutAsync()
     {
         SecureStorage.Default.Remove(AccessTokenKey);
         SecureStorage.Default.Remove(ExpiresAtKey);
+        SecureStorage.Default.Remove(RoleKey);
         return Task.CompletedTask;
     }
 }

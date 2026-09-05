@@ -4,6 +4,7 @@ public interface IAuthService
 {
     Task<bool> HasValidSessionAsync();
     Task<string?> GetAccessTokenAsync();
+    Task<string?> GetRoleAsync();
     Task LoginAsync(string username, string password, string role, CancellationToken cancellationToken = default);
     Task LogoutAsync();
 }

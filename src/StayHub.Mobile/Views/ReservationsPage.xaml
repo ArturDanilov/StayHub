@@ -6,33 +6,94 @@
     xmlns:models="clr-namespace:StayHub.Mobile.Models"
     Title="Reservations">
 
-    <Grid Padding="20,16" RowDefinitions="Auto,Auto,*" RowSpacing="14">
-        <VerticalStackLayout Spacing="4">
-            <Label Text="Reservations" Style="{StaticResource PageTitle}" />
-            <Label Text="Upcoming arrivals across all properties" Style="{StaticResource Caption}" />
-        </VerticalStackLayout>
+    <Grid Padding="20,16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+        <Grid ColumnDefinitions="*,Auto">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Reservations" Style="{StaticResource PageTitle}" />
+                <Label x:Name="SummaryLabel" Text="Live data from StayHub API" Style="{StaticResource Caption}" />
+            </VerticalStackLayout>
+            <Border Grid.Column="1" BackgroundColor="{StaticResource Secondary}" StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="12,7" VerticalOptions="Center">
+                <Label x:Name="CountLabel" Text="0" TextColor="{StaticResource Tertiary}" FontFamily="OpenSansSemibold" />
+            </Border>
+        </Grid>
 
-        <SearchBar Grid.Row="1" Placeholder="Search guest or property" />
+        <SearchBar
+            x:Name="ReservationSearchBar"
+            Grid.Row="1"
+            Placeholder="Search guest, property, source or ID"
+            IsSpellCheckEnabled="False"
+            IsTextPredictionEnabled="False"
+            TextChanged="OnSearchTextChanged" />
 
-        <CollectionView Grid.Row="2" ItemsSource="{Binding Reservations}" SelectionMode="None">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:ReservationOverview">
-                    <Border Style="{StaticResource Card}" Margin="0,0,0,12">
-                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6">
-                            <Label Text="{Binding GuestName}" Style="{StaticResource SectionTitle}" />
-                            <Border Grid.Column="1" BackgroundColor="{Binding StatusColor}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="9,5">
-                                <Label Text="{Binding Status}" TextColor="White" FontSize="11" FontFamily="OpenSansSemibold" />
+        <Picker
+            x:Name="StatusPicker"
+            Grid.Row="2"
+            Title="Status"
+            SelectedIndexChanged="OnStatusChanged">
+            <Picker.Items>
+                <x:String>All statuses</x:String>
+                <x:String>Confirmed</x:String>
+                <x:String>Checked in</x:String>
+                <x:String>Checked out</x:String>
+                <x:String>Cancelled</x:String>
+            </Picker.Items>
+        </Picker>
+
+        <Grid Grid.Row="3">
+            <RefreshView x:Name="ReservationsRefreshView" Refreshing="OnRefreshing">
+                <CollectionView
+                    x:Name="ReservationsCollection"
+                    ItemsSource="{Binding Reservations}"
+                    SelectionMode="Single"
+                    SelectionChanged="OnReservationSelected">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ReservationOverview">
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6">
+                                    <Label Text="{Binding GuestName}" Style="{StaticResource SectionTitle}" />
+                                    <Border Grid.Column="1" BackgroundColor="{Binding StatusColor}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="9,5">
+                                        <Label Text="{Binding StatusLabel}" TextColor="White" FontSize="11" FontFamily="OpenSansSemibold" />
+                                    </Border>
+                                    <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding PropertyName}" Style="{StaticResource Caption}" />
+                                    <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="7">
+                                        <Label Text="{Binding ArrivalDate, StringFormat='{0:dd MMM}'}" />
+                                        <Label Text="→" Style="{StaticResource Caption}" />
+                                        <Label Text="{Binding DepartureDate, StringFormat='{0:dd MMM}'}" />
+                                    </HorizontalStackLayout>
+                                    <Label Grid.Row="3" Text="{Binding SourceName}" Style="{StaticResource Caption}" />
+                                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding ExternalId}" Style="{StaticResource Caption}" HorizontalTextAlignment="End" />
+                                </Grid>
                             </Border>
-                            <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding PropertyName}" Style="{StaticResource Caption}" />
-                            <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2" Spacing="7">
-                                <Label Text="{Binding ArrivalDate, StringFormat='{0:dd MMM}'}" />
-                                <Label Text="→" Style="{StaticResource Caption}" />
-                                <Label Text="{Binding DepartureDate, StringFormat='{0:dd MMM}'}" />
-                            </HorizontalStackLayout>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <ActivityIndicator
+                x:Name="LoadingIndicator"
+                IsVisible="False"
+                IsRunning="False"
+                Color="{StaticResource Primary}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+
+            <VerticalStackLayout
+                x:Name="ErrorPanel"
+                IsVisible="False"
+                Spacing="12"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+                <Label x:Name="ErrorLabel" HorizontalTextAlignment="Center" Style="{StaticResource Caption}" />
+                <Button Text="Try again" Clicked="OnRetryClicked" />
+            </VerticalStackLayout>
+
+            <Label
+                x:Name="EmptyLabel"
+                IsVisible="False"
+                Text="No matching reservations."
+                Style="{StaticResource Caption}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Grid>
     </Grid>
 </ContentPage>
