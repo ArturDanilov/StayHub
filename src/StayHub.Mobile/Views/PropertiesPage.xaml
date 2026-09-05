@@ -6,40 +6,70 @@
     xmlns:models="clr-namespace:StayHub.Mobile.Models"
     Title="Properties">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" />
+    </ContentPage.ToolbarItems>
+
     <Grid Padding="20,16" RowDefinitions="Auto,Auto,*" RowSpacing="16">
         <VerticalStackLayout Spacing="4">
             <Label Text="Your properties" Style="{StaticResource PageTitle}" />
-            <Label Text="A quick overview of your portfolio" Style="{StaticResource Caption}" />
+            <Label Text="Live data from StayHub API" Style="{StaticResource Caption}" />
         </VerticalStackLayout>
 
         <Border Grid.Row="1" BackgroundColor="{StaticResource Tertiary}" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="18">
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                <VerticalStackLayout>
-                    <Label Text="3" FontSize="30" FontFamily="OpenSansSemibold" TextColor="White" />
-                    <Label Text="Properties" TextColor="#D6EEF2" />
-                </VerticalStackLayout>
-                <VerticalStackLayout Grid.Column="1">
-                    <Label Text="6" FontSize="30" FontFamily="OpenSansSemibold" TextColor="White" />
-                    <Label Text="Upcoming stays" TextColor="#D6EEF2" />
-                </VerticalStackLayout>
-            </Grid>
+            <VerticalStackLayout>
+                <Label x:Name="PropertyCountLabel" Text="0" FontSize="30" FontFamily="OpenSansSemibold" TextColor="White" />
+                <Label Text="Properties" TextColor="#D6EEF2" />
+            </VerticalStackLayout>
         </Border>
 
-        <CollectionView Grid.Row="2" ItemsSource="{Binding Properties}" SelectionMode="None">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:PropertyOverview">
-                    <Border Style="{StaticResource Card}" Margin="0,0,0,12">
-                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="5">
-                            <Label Text="{Binding Name}" Style="{StaticResource SectionTitle}" />
-                            <Label Grid.Row="1" Text="{Binding Location}" Style="{StaticResource Caption}" />
-                            <Label Grid.Row="2" Text="{Binding UpcomingReservations, StringFormat='{0} upcoming reservations'}" Style="{StaticResource Caption}" />
-                            <Border Grid.Column="1" Grid.RowSpan="3" BackgroundColor="{StaticResource Secondary}" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="10,6" VerticalOptions="Center">
-                                <Label Text="{Binding Occupancy}" TextColor="{StaticResource Tertiary}" FontSize="12" FontFamily="OpenSansSemibold" />
+        <Grid Grid.Row="2">
+            <RefreshView
+                x:Name="PropertiesRefreshView"
+                Refreshing="OnRefreshing">
+                <CollectionView
+                    x:Name="PropertiesCollection"
+                    ItemsSource="{Binding Properties}"
+                    SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:PropertyOverview">
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="5">
+                                    <Label Text="{Binding Name}" Style="{StaticResource SectionTitle}" />
+                                    <Label Grid.Row="1" Text="{Binding Location}" Style="{StaticResource Caption}" />
+                                    <Label Grid.Row="2" Text="{Binding CreatedLabel}" Style="{StaticResource Caption}" />
+                                </Grid>
                             </Border>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <ActivityIndicator
+                x:Name="LoadingIndicator"
+                IsVisible="False"
+                IsRunning="False"
+                Color="{StaticResource Primary}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+
+            <VerticalStackLayout
+                x:Name="ErrorPanel"
+                IsVisible="False"
+                Spacing="12"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+                <Label x:Name="ErrorLabel" HorizontalTextAlignment="Center" Style="{StaticResource Caption}" />
+                <Button Text="Try again" Clicked="OnRetryClicked" />
+            </VerticalStackLayout>
+
+            <Label
+                x:Name="EmptyLabel"
+                IsVisible="False"
+                Text="No properties found."
+                Style="{StaticResource Caption}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+        </Grid>
     </Grid>
 </ContentPage>

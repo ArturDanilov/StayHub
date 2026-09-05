@@ -68,4 +68,8 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\StayHub.Contracts\StayHub.Contracts.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -8,21 +8,21 @@
 
     <TabBar>
         <ShellContent
+            x:Name="PropertiesContent"
             Title="Properties"
             Icon="properties.svg"
-            ContentTemplate="{DataTemplate views:PropertiesPage}"
             Route="Properties" />
 
         <ShellContent
+            x:Name="ReservationsContent"
             Title="Reservations"
             Icon="reservations.svg"
-            ContentTemplate="{DataTemplate views:ReservationsPage}"
             Route="Reservations" />
 
         <ShellContent
+            x:Name="AssistantContent"
             Title="Assistant"
             Icon="assistant.svg"
-            ContentTemplate="{DataTemplate views:AssistantPage}"
             Route="Assistant" />
     </TabBar>
 

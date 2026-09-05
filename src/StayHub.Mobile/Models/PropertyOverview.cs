@@ -1,7 +1,7 @@
 namespace StayHub.Mobile.Models;
 
 public sealed record PropertyOverview(
+    int Id,
     string Name,
     string Location,
-    int UpcomingReservations,
-    string Occupancy);
+    string CreatedLabel);
