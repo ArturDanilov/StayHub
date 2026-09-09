@@ -5,10 +5,13 @@ namespace StayHub.Mobile.Models;
 public sealed record ReservationOverview(
     int Id,
     string ExternalId,
+    int SourceId,
     string SourceName,
+    int GuestId,
     string GuestName,
     string GuestEmail,
     string? GuestPhone,
+    int PropertyId,
     string PropertyName,
     DateOnly ArrivalDate,
     DateOnly DepartureDate,

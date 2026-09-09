@@ -26,6 +26,8 @@ public static class ReservationMapper
         UpdateReservationRequest request,
         Reservation reservation)
     {
+        reservation.ExternalId = request.ExternalId.Trim();
+        reservation.SourceId = request.SourceId;
         reservation.GuestId = request.GuestId;
         reservation.ArrivalDate = request.ArrivalDate;
         reservation.DepartureDate = request.DepartureDate;

@@ -165,6 +165,7 @@ public partial class ReservationsPage : ContentPage
             reservation,
             role,
             _reservationsService,
+            _reservationFormService,
             _authService,
             _navigator,
             async () =>

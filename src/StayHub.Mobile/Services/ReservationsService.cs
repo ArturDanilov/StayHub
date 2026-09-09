@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using StayHub.Contracts.Reservations;
 using StayHub.Mobile.Models;
 
@@ -74,6 +75,40 @@ public sealed class ReservationsService(
         }
     }
 
+    public async Task UpdateAsync(
+        int id,
+        UpdateReservationRequest reservation,
+        CancellationToken cancellationToken = default)
+    {
+        using var request = await CreateAuthorizedRequestAsync(HttpMethod.Put, $"api/reservations/{id}");
+        request.Content = JsonContent.Create(reservation);
+
+        try
+        {
+            using var response = await httpClient.SendAsync(request, cancellationToken);
+            await EnsureSuccessAsync(response, "Could not update the reservation.");
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
+        {
+            throw CreateConnectionException(exception, cancellationToken);
+        }
+    }
+
+    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    {
+        using var request = await CreateAuthorizedRequestAsync(HttpMethod.Delete, $"api/reservations/{id}");
+
+        try
+        {
+            using var response = await httpClient.SendAsync(request, cancellationToken);
+            await EnsureSuccessAsync(response, "Could not delete the reservation.");
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
+        {
+            throw CreateConnectionException(exception, cancellationToken);
+        }
+    }
+
     private async Task<HttpRequestMessage> CreateAuthorizedRequestAsync(HttpMethod method, string uri)
     {
         var token = await authService.GetAccessTokenAsync();
@@ -97,9 +132,36 @@ public sealed class ReservationsService(
             return;
 
         var serverMessage = await response.Content.ReadAsStringAsync();
-        throw new ApiException(string.IsNullOrWhiteSpace(serverMessage)
-            ? fallbackMessage
-            : serverMessage.Trim('"'));
+        throw new ApiException(GetErrorMessage(serverMessage, fallbackMessage));
+    }
+
+    private static string GetErrorMessage(string responseBody, string fallbackMessage)
+    {
+        if (string.IsNullOrWhiteSpace(responseBody))
+            return fallbackMessage;
+
+        try
+        {
+            using var document = JsonDocument.Parse(responseBody);
+            if (document.RootElement.TryGetProperty("errors", out var errors))
+            {
+                foreach (var property in errors.EnumerateObject())
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Array
+                        && property.Value.GetArrayLength() > 0)
+                        return property.Value[0].GetString() ?? fallbackMessage;
+                }
+            }
+
+            if (document.RootElement.TryGetProperty("detail", out var detail))
+                return detail.GetString() ?? fallbackMessage;
+        }
+        catch (JsonException)
+        {
+            // The API also returns plain-text business errors.
+        }
+
+        return responseBody.Trim('"');
     }
 
     private static ApiException CreateConnectionException(
@@ -117,10 +179,13 @@ public sealed class ReservationsService(
         return new ReservationOverview(
             reservation.Id,
             reservation.ExternalId,
+            reservation.SourceId,
             reservation.SourceName,
+            reservation.Guest.Id,
             $"{reservation.Guest.FirstName} {reservation.Guest.LastName}",
             reservation.Guest.Email,
             reservation.Guest.Phone,
+            reservation.PropertyId,
             reservation.PropertyName,
             reservation.ArrivalDate,
             reservation.DepartureDate,

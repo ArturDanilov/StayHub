@@ -14,6 +14,7 @@ public interface IReservationRepository
     Task<bool> ExternalIdExistsAsync(
         int sourceId,
         string externalId,
+        int? excludedReservationId = null,
         CancellationToken cancellationToken = default);
 
     Task<Reservation> AddAsync(
