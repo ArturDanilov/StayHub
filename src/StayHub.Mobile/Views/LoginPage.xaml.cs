@@ -15,7 +15,6 @@ public partial class LoginPage : ContentPage
         InitializeComponent();
         UsernameEntry.Keyboard = Keyboard.Create(KeyboardFlags.None);
         PasswordEntry.Keyboard = Keyboard.Create(KeyboardFlags.None);
-        RolePicker.SelectedIndex = 0;
     }
 
     protected override async void OnAppearing()
@@ -44,10 +43,9 @@ public partial class LoginPage : ContentPage
         ErrorLabel.IsVisible = false;
 
         if (string.IsNullOrWhiteSpace(UsernameEntry.Text)
-            || string.IsNullOrWhiteSpace(PasswordEntry.Text)
-            || RolePicker.SelectedItem is not string role)
+            || string.IsNullOrWhiteSpace(PasswordEntry.Text))
         {
-            ShowError("Enter username, password, and role.");
+            ShowError("Enter username and password.");
             return;
         }
 
@@ -57,8 +55,7 @@ public partial class LoginPage : ContentPage
         {
             await _authService.LoginAsync(
                 UsernameEntry.Text.Trim(),
-                PasswordEntry.Text,
-                role);
+                PasswordEntry.Text);
 
             PasswordEntry.Text = string.Empty;
             _navigator.ShowMain();
@@ -78,7 +75,6 @@ public partial class LoginPage : ContentPage
         LoginButton.IsEnabled = !isBusy;
         UsernameEntry.IsEnabled = !isBusy;
         PasswordEntry.IsEnabled = !isBusy;
-        RolePicker.IsEnabled = !isBusy;
         LoadingIndicator.IsVisible = isBusy;
         LoadingIndicator.IsRunning = isBusy;
     }

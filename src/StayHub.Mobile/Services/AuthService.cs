@@ -13,14 +13,13 @@ public sealed class AuthService(HttpClient httpClient) : IAuthService
     public async Task LoginAsync(
         string username,
         string password,
-        string role,
         CancellationToken cancellationToken = default)
     {
         try
         {
             using var response = await httpClient.PostAsJsonAsync(
                 "api/auth/login",
-                new LoginRequest(username, password, role),
+                new LoginRequest(username, password),
                 cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
@@ -35,7 +34,7 @@ public sealed class AuthService(HttpClient httpClient) : IAuthService
 
             await SecureStorage.Default.SetAsync(AccessTokenKey, login.AccessToken);
             await SecureStorage.Default.SetAsync(ExpiresAtKey, login.ExpiresAtUtc.ToString("O"));
-            await SecureStorage.Default.SetAsync(RoleKey, role);
+            await SecureStorage.Default.SetAsync(RoleKey, login.Role);
         }
         catch (ApiException)
         {

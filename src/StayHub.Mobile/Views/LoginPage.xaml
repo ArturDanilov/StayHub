@@ -29,14 +29,6 @@
                 ReturnType="Done"
                 Completed="OnPasswordCompleted" />
 
-            <Picker x:Name="RolePicker" Title="Role">
-                <Picker.Items>
-                    <x:String>Admin</x:String>
-                    <x:String>Receptionist</x:String>
-                    <x:String>Viewer</x:String>
-                </Picker.Items>
-            </Picker>
-
             <Label
                 x:Name="ErrorLabel"
                 IsVisible="False"
