@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.ReservationFiltersPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Filters">
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Always">
+            <VerticalStackLayout Padding="20,16,20,24" Spacing="14">
+                <Label Text="Filters and sorting" Style="{StaticResource PageTitle}" />
+                <Label Text="Status" />
+                <Picker x:Name="StatusPicker" />
+                <Label Text="Property" />
+                <Picker x:Name="PropertyPicker" />
+                <Label Text="Source" />
+                <Picker x:Name="SourcePicker" />
+
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <Label Text="Arrival from" VerticalOptions="Center" />
+                    <Switch x:Name="FromSwitch" Grid.Column="1" />
+                </Grid>
+                <DatePicker x:Name="FromDatePicker" IsEnabled="{Binding IsToggled, Source={x:Reference FromSwitch}}" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <Label Text="Arrival to" VerticalOptions="Center" />
+                    <Switch x:Name="ToSwitch" Grid.Column="1" />
+                </Grid>
+                <DatePicker x:Name="ToDatePicker" IsEnabled="{Binding IsToggled, Source={x:Reference ToSwitch}}" />
+
+                <Label Text="Sort by" />
+                <Picker x:Name="SortPicker" />
+                <Label Text="Direction" />
+                <Picker x:Name="DirectionPicker" />
+                <Label x:Name="ErrorLabel" IsVisible="False" TextColor="#B3261E" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Border Grid.Row="1" BackgroundColor="{StaticResource White}" Stroke="{StaticResource Gray200}"
+                StrokeThickness="1,1,0,0" Padding="20,12,20,16">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button Text="Reset" Clicked="OnResetClicked" />
+                <Button Grid.Column="1" Text="Apply" Clicked="OnApplyClicked" />
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

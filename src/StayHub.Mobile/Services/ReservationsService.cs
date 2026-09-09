@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using StayHub.Contracts.Reservations;
 using StayHub.Mobile.Models;
+using StayHub.Contracts.Common;
 
 namespace StayHub.Mobile.Services;
 
@@ -11,29 +12,63 @@ public sealed class ReservationsService(
     HttpClient httpClient,
     IAuthService authService) : IReservationsService
 {
-    public async Task<IReadOnlyList<ReservationOverview>> GetAllAsync(
+    public async Task<PagedReservationOverview> GetAllAsync(
+        ReservationSearchCriteria criteria,
         CancellationToken cancellationToken = default)
     {
-        using var request = await CreateAuthorizedRequestAsync(HttpMethod.Get, "api/reservations");
+        using var request = await CreateAuthorizedRequestAsync(HttpMethod.Get, BuildQueryUri(criteria));
 
         try
         {
             using var response = await httpClient.SendAsync(request, cancellationToken);
             await EnsureSuccessAsync(response, "Could not load reservations.");
 
-            var reservations = await response.Content.ReadFromJsonAsync<IReadOnlyList<ReservationResponse>>(
+            var reservations = await response.Content.ReadFromJsonAsync<PagedResponse<ReservationResponse>>(
                                    cancellationToken: cancellationToken)
-                               ?? [];
+                               ?? new PagedResponse<ReservationResponse>([], 1, criteria.PageSize, 0);
 
-            return reservations
+            var items = reservations.Items
                 .Select(Map)
-                .OrderBy(reservation => reservation.ArrivalDate)
                 .ToList();
+            return new PagedReservationOverview(
+                items,
+                reservations.Page,
+                reservations.PageSize,
+                reservations.TotalCount,
+                reservations.TotalPages);
         }
-        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
+        catch (Exception exception) when (
+            exception is HttpRequestException
+            || exception is TaskCanceledException && !cancellationToken.IsCancellationRequested)
         {
             throw CreateConnectionException(exception, cancellationToken);
         }
+    }
+
+    private static string BuildQueryUri(ReservationSearchCriteria criteria)
+    {
+        var values = new List<string>
+        {
+            $"page={criteria.Page}",
+            $"pageSize={criteria.PageSize}",
+            $"sortBy={criteria.SortBy}",
+            $"sortDirection={criteria.SortDirection}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(criteria.Search))
+            values.Add($"search={Uri.EscapeDataString(criteria.Search.Trim())}");
+        if (criteria.Status.HasValue)
+            values.Add($"status={criteria.Status.Value}");
+        if (criteria.ArrivalFrom.HasValue)
+            values.Add($"arrivalFrom={criteria.ArrivalFrom.Value:yyyy-MM-dd}");
+        if (criteria.ArrivalTo.HasValue)
+            values.Add($"arrivalTo={criteria.ArrivalTo.Value:yyyy-MM-dd}");
+        if (criteria.PropertyId.HasValue)
+            values.Add($"propertyId={criteria.PropertyId.Value}");
+        if (criteria.SourceId.HasValue)
+            values.Add($"sourceId={criteria.SourceId.Value}");
+
+        return $"api/reservations?{string.Join('&', values)}";
     }
 
     public async Task UpdateStatusAsync(

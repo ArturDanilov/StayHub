@@ -16,11 +16,12 @@ public sealed class ReservationsController(
 {
     [HttpGet]
     [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
-    public async Task<ActionResult<IReadOnlyList<ReservationResponse>>> GetAll(
+    public async Task<ActionResult> GetAll(
+        [FromQuery] ReservationQueryRequest query,
         CancellationToken cancellationToken)
     {
         var reservations =
-            await reservationManager.GetAllAsync(cancellationToken);
+            await reservationManager.GetAllAsync(query, cancellationToken);
 
         return Ok(reservations);
     }

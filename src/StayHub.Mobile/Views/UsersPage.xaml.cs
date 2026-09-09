@@ -58,7 +58,7 @@ public partial class UsersPage : ContentPage
 
     private void ApplyFilter()
     {
-        var search = UserSearchBar.Text?.Trim();
+        var search = UserSearchEntry.Text?.Trim();
         var filtered = string.IsNullOrWhiteSpace(search)
             ? _allUsers
             : _allUsers.Where(user =>

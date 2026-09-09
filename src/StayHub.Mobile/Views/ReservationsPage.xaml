@@ -6,7 +6,7 @@
     xmlns:models="clr-namespace:StayHub.Mobile.Models"
     Title="Reservations">
 
-    <Grid Padding="20,16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="12">
+    <Grid Padding="20,16,20,10" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
         <Grid ColumnDefinitions="*,Auto">
             <VerticalStackLayout Spacing="4">
                 <Label Text="Reservations" Style="{StaticResource PageTitle}" />
@@ -17,41 +17,32 @@
             </Border>
         </Grid>
 
-        <SearchBar
-            x:Name="ReservationSearchBar"
-            Grid.Row="1"
-            Placeholder="Search guest, property, source or ID"
-            IsSpellCheckEnabled="False"
-            IsTextPredictionEnabled="False"
-            TextChanged="OnSearchTextChanged" />
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <Border BackgroundColor="{StaticResource Secondary}" Stroke="{StaticResource Primary}" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="12,0">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <Label Text="⌕" FontSize="25" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                    <Entry x:Name="SearchEntry" Grid.Column="1" Placeholder="Search reservations" BackgroundColor="Transparent"
+                           IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" TextChanged="OnSearchTextChanged" />
+                </Grid>
+            </Border>
+            <Button Grid.Column="1" Text="Filters" Clicked="OnFiltersClicked" Padding="16,10" />
+        </Grid>
 
-        <Picker
-            x:Name="StatusPicker"
-            Grid.Row="2"
-            Title="Status"
-            SelectedIndexChanged="OnStatusChanged">
-            <Picker.Items>
-                <x:String>All statuses</x:String>
-                <x:String>Confirmed</x:String>
-                <x:String>Checked in</x:String>
-                <x:String>Checked out</x:String>
-                <x:String>Cancelled</x:String>
-            </Picker.Items>
-        </Picker>
-
-        <Grid Grid.Row="3">
-            <RefreshView x:Name="ReservationsRefreshView" Refreshing="OnRefreshing">
-                <CollectionView
-                    x:Name="ReservationsCollection"
-                    ItemsSource="{Binding Reservations}"
-                    SelectionMode="Single"
-                    SelectionChanged="OnReservationSelected">
+        <Grid Grid.Row="2">
+            <RefreshView x:Name="ReservationsRefreshView" Refreshing="OnRefreshing" VerticalOptions="Fill">
+                <CollectionView x:Name="ReservationsCollection" ItemsSource="{Binding Reservations}"
+                                SelectionMode="Single" SelectionChanged="OnReservationSelected"
+                                VerticalOptions="Fill" VerticalScrollBarVisibility="Always">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:ReservationOverview">
                             <Border Style="{StaticResource Card}" Margin="0,0,0,12">
-                                <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6">
+                                <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6" ColumnSpacing="10">
                                     <Label Text="{Binding GuestName}" Style="{StaticResource SectionTitle}" />
-                                    <Border Grid.Column="1" BackgroundColor="{Binding StatusColor}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="9,5">
+                                    <Border Grid.Column="1" BackgroundColor="{Binding StatusColor}" StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 10" Padding="9,5" HorizontalOptions="End">
                                         <Label Text="{Binding StatusLabel}" TextColor="White" FontSize="11" FontFamily="OpenSansSemibold" />
                                     </Border>
                                     <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding PropertyName}" Style="{StaticResource Caption}" />
@@ -61,39 +52,26 @@
                                         <Label Text="{Binding DepartureDate, StringFormat='{0:dd MMM}'}" />
                                     </HorizontalStackLayout>
                                     <Label Grid.Row="3" Text="{Binding SourceName}" Style="{StaticResource Caption}" />
-                                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding ExternalId}" Style="{StaticResource Caption}" HorizontalTextAlignment="End" />
+                                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding ExternalId}" Style="{StaticResource Caption}"
+                                           HorizontalTextAlignment="End" LineBreakMode="TailTruncation" MaximumWidthRequest="150" />
                                 </Grid>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </RefreshView>
-
-            <ActivityIndicator
-                x:Name="LoadingIndicator"
-                IsVisible="False"
-                IsRunning="False"
-                Color="{StaticResource Primary}"
-                HorizontalOptions="Center"
-                VerticalOptions="Center" />
-
-            <VerticalStackLayout
-                x:Name="ErrorPanel"
-                IsVisible="False"
-                Spacing="12"
-                HorizontalOptions="Center"
-                VerticalOptions="Center">
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" Color="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" />
+            <VerticalStackLayout x:Name="ErrorPanel" IsVisible="False" Spacing="12" HorizontalOptions="Center" VerticalOptions="Center">
                 <Label x:Name="ErrorLabel" HorizontalTextAlignment="Center" Style="{StaticResource Caption}" />
                 <Button Text="Try again" Clicked="OnRetryClicked" />
             </VerticalStackLayout>
+            <Label x:Name="EmptyLabel" IsVisible="False" Text="No matching reservations." Style="{StaticResource Caption}" HorizontalOptions="Center" VerticalOptions="Center" />
+        </Grid>
 
-            <Label
-                x:Name="EmptyLabel"
-                IsVisible="False"
-                Text="No matching reservations."
-                Style="{StaticResource Caption}"
-                HorizontalOptions="Center"
-                VerticalOptions="Center" />
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto,*" ColumnSpacing="12" HeightRequest="44">
+            <Button x:Name="PreviousButton" Text="Previous" Clicked="OnPreviousClicked" />
+            <Label x:Name="PageLabel" Grid.Column="1" Text="Page 1" VerticalOptions="Center" HorizontalTextAlignment="Center" MinimumWidthRequest="80" />
+            <Button x:Name="NextButton" Grid.Column="2" Text="Next" Clicked="OnNextClicked" />
         </Grid>
     </Grid>
 </ContentPage>
