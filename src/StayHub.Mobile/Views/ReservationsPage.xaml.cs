@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using StayHub.Mobile.Models;
 using StayHub.Mobile.Services;
+using StayHub.Contracts.Users;
 
 namespace StayHub.Mobile.Views;
 
@@ -9,18 +10,26 @@ public partial class ReservationsPage : ContentPage
     private readonly IReservationsService _reservationsService;
     private readonly IAuthService _authService;
     private readonly IAppNavigator _navigator;
+    private readonly IReservationFormService _reservationFormService;
+    private readonly ToolbarItem _addReservationItem;
     private IReadOnlyList<ReservationOverview> _allReservations = [];
     private bool _hasLoaded;
 
     public ReservationsPage(
         IReservationsService reservationsService,
+        IReservationFormService reservationFormService,
         IAuthService authService,
         IAppNavigator navigator)
     {
         _reservationsService = reservationsService;
+        _reservationFormService = reservationFormService;
         _authService = authService;
         _navigator = navigator;
         InitializeComponent();
+        _addReservationItem = new ToolbarItem(
+            "Add",
+            null,
+            () => OnAddReservationClicked(null, EventArgs.Empty));
         StatusPicker.SelectedIndex = 0;
         BindingContext = this;
     }
@@ -31,8 +40,29 @@ public partial class ReservationsPage : ContentPage
     {
         base.OnAppearing();
 
+        var role = await _authService.GetRoleAsync();
+        var canCreate = role is UserRoles.Admin or UserRoles.Receptionist;
+        if (canCreate && !ToolbarItems.Contains(_addReservationItem))
+            ToolbarItems.Add(_addReservationItem);
+        else if (!canCreate && ToolbarItems.Contains(_addReservationItem))
+            ToolbarItems.Remove(_addReservationItem);
+
         if (!_hasLoaded)
             await LoadReservationsAsync();
+    }
+
+    private async void OnAddReservationClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new CreateReservationPage(
+            _reservationsService,
+            _reservationFormService,
+            _authService,
+            _navigator,
+            async () =>
+            {
+                _hasLoaded = false;
+                await LoadReservationsAsync();
+            }));
     }
 
     private async Task LoadReservationsAsync()
