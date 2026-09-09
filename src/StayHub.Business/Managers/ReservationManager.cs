@@ -1,5 +1,7 @@
 using StayHub.Business.Interfaces;
 using StayHub.Business.Results;
+using StayHub.Business.Models;
+using StayHub.Contracts.Common;
 using StayHub.Contracts.Reservations;
 using StayHub.Domain.Models;
 using StayHub.Mapping.Reservations;
@@ -13,15 +15,22 @@ public sealed class ReservationManager(
     ISourceRepository sourceRepository)
     : IReservationManager
 {
-    public async Task<IReadOnlyList<ReservationResponse>> GetAllAsync(
+    public async Task<PagedResponse<ReservationResponse>> GetAllAsync(
+        ReservationQueryRequest query,
         CancellationToken cancellationToken = default)
     {
         var reservations =
-            await reservationRepository.GetAllAsync(cancellationToken);
+            await reservationRepository.GetAllAsync(MapQuery(query), cancellationToken);
 
-        return reservations
+        var items = reservations.Items
             .Select(ReservationMapper.ToResponse)
             .ToList();
+
+        return new PagedResponse<ReservationResponse>(
+            items,
+            query.Page,
+            query.PageSize,
+            reservations.TotalCount);
     }
 
     public async Task<ReservationResponse?> GetByIdAsync(
@@ -238,5 +247,27 @@ public sealed class ReservationManager(
 
             _ => false
         };
+    }
+
+    private static ReservationQuery MapQuery(ReservationQueryRequest query)
+    {
+        return new ReservationQuery(
+            string.IsNullOrWhiteSpace(query.Search) ? null : query.Search.Trim(),
+            query.Status.HasValue ? ReservationMapper.ToDomain(query.Status.Value) : null,
+            query.ArrivalFrom,
+            query.ArrivalTo,
+            query.PropertyId,
+            query.SourceId,
+            query.SortBy switch
+            {
+                ReservationSortBy.DepartureDate => ReservationSortField.DepartureDate,
+                ReservationSortBy.GuestName => ReservationSortField.GuestName,
+                ReservationSortBy.PropertyName => ReservationSortField.PropertyName,
+                ReservationSortBy.CreatedAt => ReservationSortField.CreatedAt,
+                _ => ReservationSortField.ArrivalDate
+            },
+            query.SortDirection == SortDirection.Descending,
+            query.Page,
+            query.PageSize);
     }
 }

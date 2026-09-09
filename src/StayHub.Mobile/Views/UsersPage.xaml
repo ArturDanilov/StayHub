@@ -16,13 +16,15 @@
             <Label x:Name="SummaryLabel" Text="Manage StayHub users and roles" Style="{StaticResource Caption}" />
         </VerticalStackLayout>
 
-        <SearchBar
-            x:Name="UserSearchBar"
-            Grid.Row="1"
-            Placeholder="Search username or email"
-            IsSpellCheckEnabled="False"
-            IsTextPredictionEnabled="False"
-            TextChanged="OnSearchChanged" />
+        <Border Grid.Row="1" BackgroundColor="{StaticResource Secondary}" Stroke="{StaticResource Primary}"
+                StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="12,0">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                <Label Text="⌕" FontSize="25" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                <Entry x:Name="UserSearchEntry" Grid.Column="1" Placeholder="Search username or email"
+                       BackgroundColor="Transparent" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False"
+                       TextChanged="OnSearchChanged" />
+            </Grid>
+        </Border>
 
         <Grid Grid.Row="2">
             <RefreshView x:Name="UsersRefreshView" Refreshing="OnRefreshing">

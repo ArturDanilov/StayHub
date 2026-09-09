@@ -1,10 +1,12 @@
 using StayHub.Domain.Models;
+using StayHub.Business.Models;
 
 namespace StayHub.Business.Interfaces;
 
 public interface IReservationRepository
 {
-    Task<IReadOnlyList<Reservation>> GetAllAsync(
+    Task<PagedResult<Reservation>> GetAllAsync(
+        ReservationQuery query,
         CancellationToken cancellationToken = default);
 
     Task<Reservation?> GetByIdAsync(
