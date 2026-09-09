@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.CreateReservationPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="New reservation">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16,20,32" Spacing="14">
+            <Label Text="New reservation" Style="{StaticResource PageTitle}" />
+            <Label Text="Create a reservation in StayHub" Style="{StaticResource Caption}" />
+
+            <Label Text="External ID" />
+            <Entry x:Name="ExternalIdEntry" Placeholder="For example, MANUAL-1001" MaxLength="100"
+                   IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" />
+
+            <Label Text="Property" />
+            <Picker x:Name="PropertyPicker" Title="Select property" />
+
+            <Label Text="Guest" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Picker x:Name="GuestPicker" Title="Select guest" />
+                <Button Grid.Column="1" Text="New guest" Clicked="OnNewGuestClicked" />
+            </Grid>
+
+            <Label Text="Source" />
+            <Picker x:Name="SourcePicker" Title="Select source" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Arrival" />
+                    <DatePicker x:Name="ArrivalDatePicker" DateSelected="OnArrivalDateSelected" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="6">
+                    <Label Text="Departure" />
+                    <DatePicker x:Name="DepartureDatePicker" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label x:Name="ErrorLabel" IsVisible="False" TextColor="#C62828" />
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False"
+                               Color="{StaticResource Primary}" />
+            <Button x:Name="SaveButton" Text="Create reservation" Clicked="OnSaveClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

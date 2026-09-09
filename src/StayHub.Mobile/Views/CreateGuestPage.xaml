@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.CreateGuestPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="New guest">
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16,20,32" Spacing="14">
+            <Label Text="New guest" Style="{StaticResource PageTitle}" />
+            <Entry x:Name="FirstNameEntry" Placeholder="First name" MaxLength="100" />
+            <Entry x:Name="LastNameEntry" Placeholder="Last name" MaxLength="100" />
+            <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" MaxLength="200"
+                   IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" />
+            <Entry x:Name="PhoneEntry" Placeholder="Phone (optional)" Keyboard="Telephone" MaxLength="50" />
+            <Label x:Name="ErrorLabel" IsVisible="False" TextColor="#C62828" />
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False"
+                               Color="{StaticResource Primary}" />
+            <Button x:Name="SaveButton" Text="Create guest" Clicked="OnSaveClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

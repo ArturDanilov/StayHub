@@ -56,6 +56,24 @@ public sealed class ReservationsService(
         }
     }
 
+    public async Task CreateAsync(
+        CreateReservationRequest reservation,
+        CancellationToken cancellationToken = default)
+    {
+        using var request = await CreateAuthorizedRequestAsync(HttpMethod.Post, "api/reservations");
+        request.Content = JsonContent.Create(reservation);
+
+        try
+        {
+            using var response = await httpClient.SendAsync(request, cancellationToken);
+            await EnsureSuccessAsync(response, "Could not create the reservation.");
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
+        {
+            throw CreateConnectionException(exception, cancellationToken);
+        }
+    }
+
     private async Task<HttpRequestMessage> CreateAuthorizedRequestAsync(HttpMethod method, string uri)
     {
         var token = await authService.GetAccessTokenAsync();

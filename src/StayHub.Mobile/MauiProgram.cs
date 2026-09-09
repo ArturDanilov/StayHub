@@ -30,6 +30,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IAuthService, AuthService>();
         builder.Services.AddSingleton<IPropertiesService, PropertiesService>();
         builder.Services.AddSingleton<IReservationsService, ReservationsService>();
+        builder.Services.AddSingleton<IReservationFormService, ReservationFormService>();
         builder.Services.AddSingleton<IUsersService, UsersService>();
         builder.Services.AddSingleton<IAppNavigator, AppNavigator>();
 
