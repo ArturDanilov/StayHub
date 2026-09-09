@@ -249,12 +249,13 @@ public static class DatabaseSeeder
                 "SeedAdmin:Password must contain at least 12 characters.");
         }
 
-        const string username = "admin";
+        var username = configuration["SeedAdmin:Username"] ?? "admin";
+        var email = configuration["SeedAdmin:Email"] ?? "admin@stayhub.local";
         var user = new User
         {
             Username = username,
             NormalizedUsername = username.ToUpperInvariant(),
-            Email = "admin@stayhub.local",
+            Email = email.Trim(),
             PasswordHash = string.Empty,
             Role = AppRoles.Admin,
             IsActive = true,

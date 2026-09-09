@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using StayHub.Api.Common;
 using StayHub.Business.Interfaces;
 using StayHub.Contracts.Authentication;
@@ -13,6 +14,7 @@ public sealed class AuthController(
     : ControllerBase
 {
     [AllowAnonymous]
+    [EnableRateLimiting("login")]
     [HttpPost(ApiRoutes.Authentication.Login)]
     public async Task<ActionResult<LoginResponse>> Login(
         LoginRequest request,
