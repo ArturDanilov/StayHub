@@ -32,6 +32,15 @@
                 </Grid>
             </Border>
 
+            <Border x:Name="ActionsPanel" Style="{StaticResource Card}" IsVisible="False">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Manage reservation" Style="{StaticResource SectionTitle}" />
+                    <Button x:Name="EditButton" Text="Edit reservation" Clicked="OnEditClicked" />
+                    <Button x:Name="DeleteButton" Text="Delete reservation" Clicked="OnDeleteClicked"
+                            BackgroundColor="#B3261E" TextColor="White" IsVisible="False" />
+                </VerticalStackLayout>
+            </Border>
+
             <Border x:Name="StatusPanel" Style="{StaticResource Card}">
                 <VerticalStackLayout Spacing="12">
                     <Label Text="Update status" Style="{StaticResource SectionTitle}" />

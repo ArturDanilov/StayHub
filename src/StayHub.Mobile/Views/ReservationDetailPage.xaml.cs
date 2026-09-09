@@ -10,24 +10,74 @@ public partial class ReservationDetailPage : ContentPage
     private readonly IReservationsService _reservationsService;
     private readonly IAuthService _authService;
     private readonly IAppNavigator _navigator;
+    private readonly IReservationFormService _formService;
     private readonly Func<Task> _onUpdated;
 
     public ReservationDetailPage(
         ReservationOverview reservation,
         string? role,
         IReservationsService reservationsService,
+        IReservationFormService formService,
         IAuthService authService,
         IAppNavigator navigator,
         Func<Task> onUpdated)
     {
         _reservation = reservation;
         _reservationsService = reservationsService;
+        _formService = formService;
         _authService = authService;
         _navigator = navigator;
         _onUpdated = onUpdated;
         InitializeComponent();
         PopulateDetails();
         ConfigureStatusUpdate(role);
+        ActionsPanel.IsVisible = role is "Admin" or "Receptionist";
+        DeleteButton.IsVisible = role == "Admin";
+    }
+
+    private async void OnEditClicked(object? sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new EditReservationPage(
+            _reservation,
+            _reservationsService,
+            _formService,
+            _authService,
+            _navigator,
+            _onUpdated));
+    }
+
+    private async void OnDeleteClicked(object? sender, EventArgs e)
+    {
+        var confirmed = await DisplayAlertAsync(
+            "Delete reservation?",
+            $"Reservation {_reservation.ExternalId} will be permanently deleted.",
+            "Delete",
+            "Cancel");
+        if (!confirmed)
+            return;
+
+        SetBusy(true);
+        ErrorLabel.IsVisible = false;
+        try
+        {
+            await _reservationsService.DeleteAsync(_reservation.Id);
+            await _onUpdated();
+            await Navigation.PopAsync();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            await _authService.LogoutAsync();
+            _navigator.ShowLogin();
+        }
+        catch (ApiException exception)
+        {
+            ErrorLabel.Text = exception.Message;
+            ErrorLabel.IsVisible = true;
+        }
+        finally
+        {
+            SetBusy(false);
+        }
     }
 
     private void PopulateDetails()
@@ -106,6 +156,8 @@ public partial class ReservationDetailPage : ContentPage
         NextStatusPicker.IsEnabled = !isBusy;
         LoadingIndicator.IsVisible = isBusy;
         LoadingIndicator.IsRunning = isBusy;
+        EditButton.IsEnabled = !isBusy;
+        DeleteButton.IsEnabled = !isBusy;
     }
 
     private static IReadOnlyList<ReservationStatusContract> GetAllowedTransitions(

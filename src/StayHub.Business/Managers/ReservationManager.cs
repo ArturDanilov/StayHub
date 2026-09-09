@@ -84,6 +84,7 @@ public sealed class ReservationManager(
             await reservationRepository.ExternalIdExistsAsync(
                 request.SourceId,
                 request.ExternalId.Trim(),
+                null,
                 cancellationToken);
 
         if (externalIdExists)
@@ -140,10 +141,27 @@ public sealed class ReservationManager(
         if (guest is null)
             return ReservationError.GuestNotFound;
 
+        var source = await sourceRepository.GetByIdAsync(
+            request.SourceId,
+            cancellationToken);
+
+        if (source is null)
+            return ReservationError.SourceNotFound;
+
+        var externalIdExists = await reservationRepository.ExternalIdExistsAsync(
+            request.SourceId,
+            request.ExternalId.Trim(),
+            id,
+            cancellationToken);
+
+        if (externalIdExists)
+            return ReservationError.ExternalIdAlreadyExists;
+
         ReservationMapper.MapToDomain(request, reservation);
 
         reservation.Property = property;
         reservation.Guest = guest;
+        reservation.Source = source;
 
         await reservationRepository.SaveChangesAsync(
             cancellationToken);

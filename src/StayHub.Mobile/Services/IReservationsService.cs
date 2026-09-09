@@ -7,5 +7,7 @@ public interface IReservationsService
 {
     Task<IReadOnlyList<ReservationOverview>> GetAllAsync(CancellationToken cancellationToken = default);
     Task CreateAsync(CreateReservationRequest request, CancellationToken cancellationToken = default);
+    Task UpdateAsync(int id, UpdateReservationRequest request, CancellationToken cancellationToken = default);
+    Task DeleteAsync(int id, CancellationToken cancellationToken = default);
     Task UpdateStatusAsync(int id, ReservationStatusContract status, CancellationToken cancellationToken = default);
 }

@@ -34,11 +34,14 @@ public sealed class ReservationRepository(StayHubDbContext dbContext)
     public Task<bool> ExternalIdExistsAsync(
         int sourceId,
         string externalId,
+        int? excludedReservationId = null,
         CancellationToken cancellationToken = default)
     {
         return dbContext.Reservations
             .AnyAsync(
-                x => x.SourceId == sourceId && x.ExternalId == externalId,
+                x => x.SourceId == sourceId
+                     && x.ExternalId == externalId
+                     && (!excludedReservationId.HasValue || x.Id != excludedReservationId.Value),
                 cancellationToken);
     }
 
