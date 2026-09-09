@@ -243,10 +243,10 @@ public static class DatabaseSeeder
             return;
         }
 
-        if (password.Length < 12)
+        if (password.Length < 8)
         {
             throw new InvalidOperationException(
-                "SeedAdmin:Password must contain at least 12 characters.");
+                "SeedAdmin:Password must contain at least 8 characters.");
         }
 
         var username = configuration["SeedAdmin:Username"] ?? "admin";

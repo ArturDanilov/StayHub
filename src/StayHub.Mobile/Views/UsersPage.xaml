@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.UsersPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:StayHub.Mobile.Models"
+    Title="Users">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Clicked="OnAddClicked" />
+    </ContentPage.ToolbarItems>
+
+    <Grid Padding="20,16" RowDefinitions="Auto,Auto,*" RowSpacing="14">
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Team access" Style="{StaticResource PageTitle}" />
+            <Label x:Name="SummaryLabel" Text="Manage StayHub users and roles" Style="{StaticResource Caption}" />
+        </VerticalStackLayout>
+
+        <SearchBar
+            x:Name="UserSearchBar"
+            Grid.Row="1"
+            Placeholder="Search username or email"
+            IsSpellCheckEnabled="False"
+            IsTextPredictionEnabled="False"
+            TextChanged="OnSearchChanged" />
+
+        <Grid Grid.Row="2">
+            <RefreshView x:Name="UsersRefreshView" Refreshing="OnRefreshing">
+                <CollectionView
+                    x:Name="UsersCollection"
+                    ItemsSource="{Binding Users}"
+                    SelectionMode="Single"
+                    SelectionChanged="OnUserSelected">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:UserOverview">
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="5">
+                                    <Label Text="{Binding Username}" Style="{StaticResource SectionTitle}" />
+                                    <Border Grid.Column="1" BackgroundColor="{Binding StatusColor}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="9,5">
+                                        <Label Text="{Binding StatusLabel}" TextColor="White" FontSize="11" />
+                                    </Border>
+                                    <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Email}" Style="{StaticResource Caption}" />
+                                    <Label Grid.Row="2" Text="{Binding Role}" TextColor="{StaticResource Primary}" FontFamily="OpenSansSemibold" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" HorizontalOptions="Center" VerticalOptions="Center" />
+
+            <VerticalStackLayout x:Name="ErrorPanel" IsVisible="False" Spacing="12" HorizontalOptions="Center" VerticalOptions="Center">
+                <Label x:Name="ErrorLabel" Style="{StaticResource Caption}" HorizontalTextAlignment="Center" />
+                <Button Text="Try again" Clicked="OnRetryClicked" />
+            </VerticalStackLayout>
+
+            <Label x:Name="EmptyLabel" IsVisible="False" Text="No users found." Style="{StaticResource Caption}" HorizontalOptions="Center" VerticalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

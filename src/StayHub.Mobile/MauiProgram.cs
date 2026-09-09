@@ -30,6 +30,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IAuthService, AuthService>();
         builder.Services.AddSingleton<IPropertiesService, PropertiesService>();
         builder.Services.AddSingleton<IReservationsService, ReservationsService>();
+        builder.Services.AddSingleton<IUsersService, UsersService>();
         builder.Services.AddSingleton<IAppNavigator, AppNavigator>();
 
         builder.Services.AddTransient<LoginPage>();
@@ -37,6 +38,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PropertiesPage>();
         builder.Services.AddTransient<ReservationsPage>();
         builder.Services.AddTransient<AssistantPage>();
+        builder.Services.AddTransient<UsersPage>();
 
         return builder.Build();
     }

@@ -24,6 +24,12 @@
             Title="Assistant"
             Icon="assistant.svg"
             Route="Assistant" />
+
+        <ShellContent
+            x:Name="UsersContent"
+            Title="Users"
+            Icon="users.svg"
+            Route="Users" />
     </TabBar>
 
 </Shell>
