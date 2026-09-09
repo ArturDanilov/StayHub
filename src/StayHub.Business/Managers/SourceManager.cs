@@ -5,7 +5,7 @@ using StayHub.Mapping.Sources;
 namespace StayHub.Business.Managers;
 
 public sealed class SourceManager(ISourceRepository repository)
-    : ISourceManager
+    : ISourceManager  
 {
     public async Task<IReadOnlyList<SourceResponse>> GetAllAsync(
         CancellationToken cancellationToken = default)

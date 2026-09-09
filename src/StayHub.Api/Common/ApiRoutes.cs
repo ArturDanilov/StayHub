@@ -34,4 +34,12 @@ public class ApiRoutes
         public const string Base = $"{Api}/guests";
         public const string ById = "{id:int}";
     }
+
+    public static class Users
+    {
+        public const string Base = $"{Api}/users";
+        public const string Role = "{id:int}/role";
+        public const string Status = "{id:int}/status";
+        public const string Password = "{id:int}/password";
+    }
 }

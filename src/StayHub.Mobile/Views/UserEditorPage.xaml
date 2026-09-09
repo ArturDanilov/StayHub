@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.UserEditorPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="User">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16" Spacing="16">
+            <VerticalStackLayout Spacing="4">
+                <Label x:Name="TitleLabel" Text="New user" Style="{StaticResource PageTitle}" />
+                <Label x:Name="SubtitleLabel" Text="Create access for a team member" Style="{StaticResource Caption}" />
+            </VerticalStackLayout>
+
+            <Border Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="14">
+                    <Entry x:Name="UsernameEntry" Placeholder="Username" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" />
+                    <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" />
+                    <Picker x:Name="RolePicker" Title="Role">
+                        <Picker.Items>
+                            <x:String>Admin</x:String>
+                            <x:String>Receptionist</x:String>
+                            <x:String>Viewer</x:String>
+                        </Picker.Items>
+                    </Picker>
+                    <HorizontalStackLayout x:Name="ActiveRow" Spacing="12" IsVisible="False">
+                        <Switch x:Name="ActiveSwitch" IsToggled="True" />
+                        <Label Text="Active account" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Entry x:Name="PasswordEntry" Placeholder="Password (minimum 8 characters)" IsPassword="True" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" />
+                    <Label x:Name="PasswordHint" IsVisible="False" Text="Leave blank to keep the current password." Style="{StaticResource Caption}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label x:Name="ErrorLabel" IsVisible="False" TextColor="#B3261E" FontSize="13" />
+            <Button x:Name="SaveButton" Text="Create user" Clicked="OnSaveClicked" />
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

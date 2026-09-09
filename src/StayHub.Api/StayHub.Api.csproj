@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup>
+    <UserSecretsId>stayhub-api-development</UserSecretsId>
+  </PropertyGroup>
+
     <PropertyGroup>
       <RootNamespace>StayHub.Api</RootNamespace>
     </PropertyGroup>

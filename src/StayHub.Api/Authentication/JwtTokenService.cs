@@ -52,6 +52,7 @@ public sealed class JwtTokenService(
 
         return new LoginResponse(
             accessToken,
-            expiresAtUtc);
+            expiresAtUtc,
+            role);
     }
 }

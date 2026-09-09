@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray950}}">
+
+    <Grid Padding="28" RowDefinitions="*,Auto,*">
+        <VerticalStackLayout Grid.Row="1" Spacing="18" MaximumWidthRequest="440">
+            <VerticalStackLayout Spacing="6" Margin="0,0,0,10">
+                <Label Text="StayHub" FontSize="38" FontFamily="OpenSansSemibold" TextColor="{StaticResource Tertiary}" />
+                <Label Text="Sign in to manage your hospitality portfolio" Style="{StaticResource Caption}" />
+            </VerticalStackLayout>
+
+            <Entry
+                x:Name="UsernameEntry"
+                Placeholder="Username"
+                IsSpellCheckEnabled="False"
+                IsTextPredictionEnabled="False"
+                ReturnType="Next"
+                Completed="OnUsernameCompleted" />
+
+            <Entry
+                x:Name="PasswordEntry"
+                Placeholder="Password"
+                IsPassword="True"
+                IsSpellCheckEnabled="False"
+                IsTextPredictionEnabled="False"
+                ReturnType="Done"
+                Completed="OnPasswordCompleted" />
+
+            <Label
+                x:Name="ErrorLabel"
+                IsVisible="False"
+                TextColor="#B3261E"
+                FontSize="13" />
+
+            <Button
+                x:Name="LoginButton"
+                Text="Sign in"
+                Clicked="OnLoginClicked" />
+
+            <ActivityIndicator
+                x:Name="LoadingIndicator"
+                IsVisible="False"
+                IsRunning="False"
+                Color="{StaticResource Primary}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

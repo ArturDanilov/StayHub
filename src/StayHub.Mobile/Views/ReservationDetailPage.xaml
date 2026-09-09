@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.ReservationDetailPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Reservation">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20,16" Spacing="16">
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Spacing="4">
+                    <Label x:Name="GuestNameLabel" Style="{StaticResource PageTitle}" />
+                    <Label x:Name="ExternalIdLabel" Style="{StaticResource Caption}" />
+                </VerticalStackLayout>
+                <Border x:Name="StatusBadge" Grid.Column="1" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="10,6" VerticalOptions="Center">
+                    <Label x:Name="StatusLabel" TextColor="White" FontSize="12" FontFamily="OpenSansSemibold" />
+                </Border>
+            </Grid>
+
+            <Border Style="{StaticResource Card}">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="14" ColumnSpacing="16">
+                    <Label Text="Property" Style="{StaticResource Caption}" />
+                    <Label x:Name="PropertyLabel" Grid.Column="1" HorizontalTextAlignment="End" />
+                    <Label Grid.Row="1" Text="Stay" Style="{StaticResource Caption}" />
+                    <Label x:Name="DatesLabel" Grid.Row="1" Grid.Column="1" HorizontalTextAlignment="End" />
+                    <Label Grid.Row="2" Text="Source" Style="{StaticResource Caption}" />
+                    <Label x:Name="SourceLabel" Grid.Row="2" Grid.Column="1" HorizontalTextAlignment="End" />
+                    <Label Grid.Row="3" Text="Email" Style="{StaticResource Caption}" />
+                    <Label x:Name="EmailLabel" Grid.Row="3" Grid.Column="1" HorizontalTextAlignment="End" LineBreakMode="TailTruncation" />
+                    <Label Grid.Row="4" Text="Phone" Style="{StaticResource Caption}" />
+                    <Label x:Name="PhoneLabel" Grid.Row="4" Grid.Column="1" HorizontalTextAlignment="End" />
+                </Grid>
+            </Border>
+
+            <Border x:Name="StatusPanel" Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Update status" Style="{StaticResource SectionTitle}" />
+                    <Picker x:Name="NextStatusPicker" Title="Choose next status" />
+                    <Label x:Name="PermissionLabel" IsVisible="False" Style="{StaticResource Caption}" />
+                    <Label x:Name="ErrorLabel" IsVisible="False" TextColor="#B3261E" FontSize="13" />
+                    <Button x:Name="UpdateButton" Text="Update status" Clicked="OnUpdateStatusClicked" />
+                    <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

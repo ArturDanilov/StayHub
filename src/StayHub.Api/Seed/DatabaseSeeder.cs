@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using StayHub.Business.Interfaces;
+using StayHub.Api.Common;
 using StayHub.Dal;
 using StayHub.Dal.Data;
 using StayHub.Domain.Models;
@@ -16,6 +18,11 @@ public static class DatabaseSeeder
         var db = scope.ServiceProvider.GetRequiredService<StayHubDbContext>();
 
         await db.Database.MigrateAsync(cancellationToken);
+
+        await SeedDevelopmentAdminAsync(
+            scope.ServiceProvider,
+            db,
+            cancellationToken);
 
         if (await db.Properties.AnyAsync(cancellationToken))
             return;
@@ -212,6 +219,52 @@ public static class DatabaseSeeder
 
         #endregion
 
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
+    private static async Task SeedDevelopmentAdminAsync(
+        IServiceProvider serviceProvider,
+        StayHubDbContext db,
+        CancellationToken cancellationToken)
+    {
+        if (await db.Users.AnyAsync(cancellationToken))
+            return;
+
+        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        var logger = serviceProvider
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger(nameof(DatabaseSeeder));
+        var password = configuration["SeedAdmin:Password"];
+
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            logger.LogWarning(
+                "No development user was created. Configure SeedAdmin:Password with user-secrets or an environment variable.");
+            return;
+        }
+
+        if (password.Length < 8)
+        {
+            throw new InvalidOperationException(
+                "SeedAdmin:Password must contain at least 8 characters.");
+        }
+
+        var username = configuration["SeedAdmin:Username"] ?? "admin";
+        var email = configuration["SeedAdmin:Email"] ?? "admin@stayhub.local";
+        var user = new User
+        {
+            Username = username,
+            NormalizedUsername = username.ToUpperInvariant(),
+            Email = email.Trim(),
+            PasswordHash = string.Empty,
+            Role = AppRoles.Admin,
+            IsActive = true,
+            CreatedAtUtc = new DateTime(2026, 9, 9, 12, 0, 0, DateTimeKind.Utc)
+        };
+
+        var passwordService = serviceProvider.GetRequiredService<IPasswordService>();
+        user.PasswordHash = passwordService.Hash(user, password);
+        db.Users.Add(user);
         await db.SaveChangesAsync(cancellationToken);
     }
 }
