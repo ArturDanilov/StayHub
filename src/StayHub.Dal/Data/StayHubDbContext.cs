@@ -9,6 +9,7 @@ public class StayHubDbContext(DbContextOptions<StayHubDbContext> options) : DbCo
     public DbSet<Property> Properties => Set<Property>();
     public DbSet<Reservation> Reservations => Set<Reservation>();
     public DbSet<Guest> Guests => Set<Guest>();
+    public DbSet<User> Users => Set<User>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -98,6 +99,40 @@ public class StayHubDbContext(DbContextOptions<StayHubDbContext> options) : DbCo
                 .IsUnique();
 
             entity.Property(x => x.Phone)
+                .HasMaxLength(50);
+
+            entity.Property(x => x.CreatedAtUtc)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Username)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(x => x.NormalizedUsername)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasIndex(x => x.NormalizedUsername)
+                .IsUnique();
+
+            entity.Property(x => x.Email)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.HasIndex(x => x.Email)
+                .IsUnique();
+
+            entity.Property(x => x.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(1000);
+
+            entity.Property(x => x.Role)
+                .IsRequired()
                 .HasMaxLength(50);
 
             entity.Property(x => x.CreatedAtUtc)

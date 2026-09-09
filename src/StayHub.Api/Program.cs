@@ -54,6 +54,9 @@ builder.Services.AddScoped<IGuestRepository, GuestRepository>();
 builder.Services.AddScoped<IGuestManager, GuestManager>();
 
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 
 var jwtOptions = builder.Configuration
                      .GetSection(JwtOptions.SectionName)
