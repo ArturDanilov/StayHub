@@ -16,8 +16,8 @@ variables; production credentials must not be committed to the repository.
 | `SeedAdmin__Username` | Initial administrator username |
 | `SeedAdmin__Email` | Initial administrator email |
 | `SeedAdmin__Password` | Initial administrator password |
-| `SeedData__DemoDataEnabled` | Set to `true` only for the portfolio/demo environment |
-| `Swagger__Enabled` | Set to `true` for the portfolio/demo environment |
+| `SeedData__DemoDataEnabled` | Keep `false` in production; enable only while initially creating demo data |
+| `Swagger__Enabled` | Keep `false` in production; enable temporarily for an API demonstration |
 
 `DatabaseInitialization__ApplyMigrations` defaults to `true`. The API applies
 pending EF Core migrations before accepting traffic. This is appropriate for
@@ -28,7 +28,7 @@ separate deployment step.
 
 - `/health/live` verifies that the API process is running.
 - `/health/ready` verifies that the API can connect to the database.
-- `/swagger` is available when `Swagger__Enabled=true`.
+- `/swagger` is available only when `Swagger__Enabled=true`.
 
 ## Container settings
 

@@ -9,6 +9,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        var apiSettings = ApiSettings.Load();
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -22,9 +23,10 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
+        builder.Services.AddSingleton(apiSettings);
         builder.Services.AddSingleton(new HttpClient
         {
-            BaseAddress = new Uri(ApiSettings.BaseAddress),
+            BaseAddress = new Uri(apiSettings.BaseAddress),
             Timeout = TimeSpan.FromSeconds(15)
         });
         builder.Services.AddSingleton<IAuthService, AuthService>();
