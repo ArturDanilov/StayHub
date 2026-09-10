@@ -58,6 +58,20 @@ public static class DatabaseSeeder
                 City = "Rottach-Egern",
                 CountryCode = "DE",
                 CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                Name = "Albrecht-Thaer-Straße 2",
+                City = "Nürnberg",
+                CountryCode = "DE",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                Name = "Planegger Straße 112",
+                City = "München",
+                CountryCode = "DE",
+                CreatedAtUtc = createdAtUtc
             }
         };
 
@@ -107,6 +121,70 @@ public static class DatabaseSeeder
                 LastName = "Johnson",
                 Email = "emily.johnson@example.com",
                 Phone = "+1 555 987654",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                FirstName = "Artur",
+                LastName = "Danilov",
+                Email = "artur.danilov@example.com",
+                Phone = "+49 151 00000001",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                FirstName = "Iana",
+                LastName = "Danilova",
+                Email = "iana.danilova@example.com",
+                Phone = "+49 151 00000002",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                FirstName = "Toni",
+                LastName = "Danilov",
+                Email = "toni.danilov@example.com",
+                Phone = "+49 151 00000003",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                FirstName = "Alex",
+                LastName = "Danilov",
+                Email = "alex.danilov@example.com",
+                Phone = "+49 151 00000004",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                FirstName = "Maria",
+                LastName = "Nedobor",
+                Email = "maria.nedobor@example.com",
+                Phone = "+49 151 00000005",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                FirstName = "Timo",
+                LastName = "Nedobor",
+                Email = "timo.nedobor@example.com",
+                Phone = "+49 151 00000006",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                FirstName = "Nik",
+                LastName = "Scherbakov",
+                Email = "nik.scherbakov@example.com",
+                Phone = "+49 151 00000007",
+                CreatedAtUtc = createdAtUtc
+            },
+            new()
+            {
+                FirstName = "Julia",
+                LastName = "Scherbakova",
+                Email = "julia.scherbakova@example.com",
+                Phone = "+49 151 00000008",
                 CreatedAtUtc = createdAtUtc
             }
         };
