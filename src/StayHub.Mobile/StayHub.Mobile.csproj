@@ -3,6 +3,8 @@
     <PropertyGroup>
         <TargetFramework />
         <TargetFrameworks>net10.0-ios</TargetFrameworks>
+        <StayHubEnvironment Condition="'$(Configuration)' == 'Release'">Production</StayHubEnvironment>
+        <StayHubEnvironment Condition="'$(StayHubEnvironment)' == ''">Development</StayHubEnvironment>
 
         <!-- Note for MacCatalyst:
         The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -47,6 +49,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <EmbeddedResource Include="Configuration/appsettings.$(StayHubEnvironment).json"
+                          LogicalName="StayHub.Mobile.Configuration.appsettings.json" />
+
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#126E82"/>
 

@@ -88,8 +88,9 @@ Swagger is available locally at
 Core migrations and deterministic development seed data are applied during
 startup.
 
-The MAUI app is in `src/StayHub.Mobile`. Select an iOS simulator or a
-provisioned physical iPhone and run `StayHub.Mobile` from Rider.
+The MAUI app is in `src/StayHub.Mobile`. A Debug build reads
+`Configuration/appsettings.Development.json` and connects to the local API.
+Select an iOS simulator and run `StayHub.Mobile` from Rider.
 
 Stop the local database with:
 
@@ -105,17 +106,21 @@ The portfolio environment uses this flow:
 iPhone → Azure Container Apps → Azure SQL Database
 ```
 
+A Release build of the MAUI app reads
+`Configuration/appsettings.Production.json` and connects to the Azure API.
+Use Release when running the application on a provisioned physical iPhone.
+
 - API: Azure Container Apps Consumption, scaled from zero to one replica
 - Container image: Azure Container Registry
 - Database: Azure SQL Database, serverless free offer with overage disabled
 - Secrets: Container App secrets exposed to ASP.NET Core as environment
   variables
 - Diagnostics: `/health/live` and `/health/ready`
+- Production Swagger and demo seeding: disabled
 
-The deployed API documentation is available at
-[StayHub Swagger](https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/swagger/index.html).
 The first request can take a few seconds while the application scales from
-zero.
+zero. Swagger can be enabled temporarily through the Container App
+configuration when an API demonstration is required.
 
 Deployment configuration, required environment variables, and operational
 notes are documented in [Azure deployment](docs/AZURE_DEPLOYMENT.md).
