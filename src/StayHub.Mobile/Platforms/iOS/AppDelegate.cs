@@ -21,10 +21,10 @@ public class AppDelegate : MauiUIApplicationDelegate
         tabBar.ItemSpacing = 0;
 
         var item = UITabBarItem.Appearance;
-        item.TitlePositionAdjustment = new UIOffset(0, -11);
+        item.TitlePositionAdjustment = new UIOffset(0, -7);
         var attributes = new UIStringAttributes
         {
-            Font = UIFont.SystemFontOfSize(16, UIFontWeight.Semibold)
+            Font = UIFont.SystemFontOfSize(14, UIFontWeight.Semibold)
         };
         item.SetTitleTextAttributes(attributes, UIControlState.Normal);
         item.SetTitleTextAttributes(attributes, UIControlState.Selected);
