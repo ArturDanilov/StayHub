@@ -19,10 +19,14 @@ public static class DatabaseSeeder
 
         await db.Database.MigrateAsync(cancellationToken);
 
-        await SeedDevelopmentAdminAsync(
+        await SeedAdminAsync(
             scope.ServiceProvider,
             db,
             cancellationToken);
+
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        if (!configuration.GetValue<bool>("SeedData:DemoDataEnabled"))
+            return;
 
         if (await db.Properties.AnyAsync(cancellationToken))
             return;
@@ -222,7 +226,7 @@ public static class DatabaseSeeder
         await db.SaveChangesAsync(cancellationToken);
     }
 
-    private static async Task SeedDevelopmentAdminAsync(
+    private static async Task SeedAdminAsync(
         IServiceProvider serviceProvider,
         StayHubDbContext db,
         CancellationToken cancellationToken)
@@ -239,7 +243,7 @@ public static class DatabaseSeeder
         if (string.IsNullOrWhiteSpace(password))
         {
             logger.LogWarning(
-                "No development user was created. Configure SeedAdmin:Password with user-secrets or an environment variable.");
+                "No admin user was created. Configure SeedAdmin:Password with user-secrets or an environment variable.");
             return;
         }
 

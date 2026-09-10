@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+.git/
+.idea/
+.vs/
+.DS_Store
+*.user
+*.log

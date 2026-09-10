@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using StayHub.Business.Interfaces;
 using StayHub.Business.Managers;
 using StayHub.Dal.Data;
@@ -9,10 +10,18 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using StayHub.Api.Authentication;
 using StayHub.Api.Common;
+using StayHub.Api.Health;
 using StayHub.Api.Seed;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("StayHubDb");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Connection string 'StayHubDb' is missing. Configure ConnectionStrings__StayHubDb.");
+}
 
 builder.Services.AddControllers();
 builder.Services.AddRateLimiter(options =>
@@ -28,6 +37,8 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition(
@@ -52,7 +63,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddDbContext<StayHubDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("StayHubDb")));
+        connectionString,
+        sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IPropertyManager, PropertyManager>();
@@ -76,6 +88,16 @@ var jwtOptions = builder.Configuration
                      .GetSection(JwtOptions.SectionName)
                      .Get<JwtOptions>()
                  ?? throw new InvalidOperationException("JWT configuration is missing.");
+
+if (string.IsNullOrWhiteSpace(jwtOptions.Issuer)
+    || string.IsNullOrWhiteSpace(jwtOptions.Audience)
+    || jwtOptions.Key.Length < 32
+    || jwtOptions.ExpirationMinutes <= 0)
+{
+    throw new InvalidOperationException(
+        "JWT configuration is invalid. Issuer, Audience, a key of at least 32 characters, " +
+        "and a positive ExpirationMinutes value are required.");
+}
 
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection(JwtOptions.SectionName));
@@ -122,7 +144,7 @@ builder.Services.AddAuthorization(options =>
 });
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (builder.Configuration.GetValue("DatabaseInitialization:ApplyMigrations", true))
 {
     await DatabaseSeeder.SeedAsync(app.Services);
 }
@@ -131,12 +153,22 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment()
+    || builder.Configuration.GetValue<bool>("Swagger:Enabled"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.MapControllers();
+app.MapHealthChecks(
+    "/health/live",
+    new HealthCheckOptions { Predicate = _ => false });
+app.MapHealthChecks(
+    "/health/ready",
+    new HealthCheckOptions
+    {
+        Predicate = healthCheck => healthCheck.Tags.Contains("ready")
+    });
 
 app.Run();
