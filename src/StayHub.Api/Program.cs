@@ -12,6 +12,7 @@ using StayHub.Api.Authentication;
 using StayHub.Api.Common;
 using StayHub.Api.Health;
 using StayHub.Api.Seed;
+using StayHub.Api.Integration;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,6 +84,12 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 builder.Services.AddScoped<IUserManager, UserManager>();
+builder.Services.AddScoped<ISynchronizationRunRepository, SynchronizationRunRepository>();
+builder.Services.AddScoped<ISynchronizationManager, SynchronizationManager>();
+builder.Services.AddHttpClient<IExternalReservationClient, ExternalReservationClient>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
 
 var jwtOptions = builder.Configuration
                      .GetSection(JwtOptions.SectionName)

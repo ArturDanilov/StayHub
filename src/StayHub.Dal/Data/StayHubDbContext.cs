@@ -10,6 +10,7 @@ public class StayHubDbContext(DbContextOptions<StayHubDbContext> options) : DbCo
     public DbSet<Reservation> Reservations => Set<Reservation>();
     public DbSet<Guest> Guests => Set<Guest>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<SynchronizationRun> SynchronizationRuns => Set<SynchronizationRun>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -137,6 +138,19 @@ public class StayHubDbContext(DbContextOptions<StayHubDbContext> options) : DbCo
 
             entity.Property(x => x.CreatedAtUtc)
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<SynchronizationRun>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Status).IsRequired();
+            entity.Property(x => x.StartedAtUtc).IsRequired();
+            entity.Property(x => x.ErrorMessage).HasMaxLength(2000);
+            entity.HasIndex(x => new { x.SourceId, x.StartedAtUtc });
+            entity.HasOne(x => x.Source)
+                .WithMany(x => x.SynchronizationRuns)
+                .HasForeignKey(x => x.SourceId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

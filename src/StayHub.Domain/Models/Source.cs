@@ -15,4 +15,6 @@ public class Source
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public ICollection<Reservation> Reservations { get; set; } = [];
+
+    public ICollection<SynchronizationRun> SynchronizationRuns { get; set; } = [];
 }

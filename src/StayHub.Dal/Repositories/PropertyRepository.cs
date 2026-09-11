@@ -25,6 +25,13 @@ public sealed class PropertyRepository(StayHubDbContext dbContext)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
+    public Task<Property?> GetByNameAsync(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        return dbContext.Properties.FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
+    }
+
     public async Task<Property> AddAsync(
         Property property,
         CancellationToken cancellationToken = default)
