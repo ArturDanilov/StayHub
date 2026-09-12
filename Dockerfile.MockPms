@@ -1,0 +1,22 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY Directory.Build.props Directory.Packages.props global.json ./
+COPY src/StayHub.Contracts/StayHub.Contracts.csproj src/StayHub.Contracts/
+COPY src/StayHub.MockPms/StayHub.MockPms.csproj src/StayHub.MockPms/
+RUN dotnet restore src/StayHub.MockPms/StayHub.MockPms.csproj
+
+COPY src/StayHub.Contracts/ src/StayHub.Contracts/
+COPY src/StayHub.MockPms/ src/StayHub.MockPms/
+RUN dotnet publish src/StayHub.MockPms/StayHub.MockPms.csproj \
+    --configuration Release \
+    --no-restore \
+    --output /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+ENV ASPNETCORE_HTTP_PORTS=8080
+EXPOSE 8080
+COPY --from=build /app/publish .
+USER $APP_UID
+ENTRYPOINT ["dotnet", "StayHub.MockPms.dll"]

@@ -6,8 +6,7 @@ namespace StayHub.Mapping.Reservations;
 
 public static class ReservationMapper
 {
-    public static Reservation ToDomain(
-        CreateReservationRequest request)
+    public static Reservation ToDomain(CreateReservationRequest request)
     {
         return new Reservation
         {
@@ -34,8 +33,7 @@ public static class ReservationMapper
         reservation.PropertyId = request.PropertyId;
     }
 
-    public static ReservationResponse ToResponse(
-        Reservation reservation)
+    public static ReservationResponse ToResponse(Reservation reservation)
     {
         return new ReservationResponse(
             reservation.Id,

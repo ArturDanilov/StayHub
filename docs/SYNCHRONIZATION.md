@@ -46,5 +46,32 @@ Both endpoints require the `ManageReservations` authorization policy.
 
 `localhost` only works when both APIs run on the same development machine. For
 Azure, deploy `StayHub.MockPms` separately and update the Mock PMS source URL to
-its HTTPS endpoint. A scheduled background worker is intentionally postponed
-until manual synchronization is proven reliable.
+its HTTPS endpoint.
+
+## Automatic synchronization
+
+The API contains a background worker that can periodically synchronize enabled
+sources with a configured URL. It uses the same `SynchronizationManager` as the
+manual endpoint, so import rules and run history stay identical. A per-source
+execution gate prevents a manual and an automatic run from executing at the
+same time inside one API instance.
+
+Development enables the worker only for `Mock PMS`: it waits 30 seconds after
+API startup and then runs at most once every six hours. Production disables the
+worker by default so Azure Container Apps can scale to zero without a permanent
+replica consuming resources. Configuration is controlled through:
+
+```json
+{
+  "AutomaticSynchronization": {
+    "Enabled": false,
+    "IntervalMinutes": 720,
+    "InitialDelaySeconds": 60,
+    "SourceNames": []
+  }
+}
+```
+
+For a low-traffic Azure deployment, prefer a scheduled Container Apps Job when
+automatic cloud synchronization is required. A continuously hosted worker
+cannot run while the API is scaled to zero.

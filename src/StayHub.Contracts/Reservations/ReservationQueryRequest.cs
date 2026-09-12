@@ -8,7 +8,9 @@ public sealed class ReservationQueryRequest
     public string? Search { get; init; }
 
     public ReservationStatusContract? Status { get; init; }
+    
     public DateOnly? ArrivalFrom { get; init; }
+    
     public DateOnly? ArrivalTo { get; init; }
 
     [Range(1, int.MaxValue)]
@@ -18,6 +20,7 @@ public sealed class ReservationQueryRequest
     public int? SourceId { get; init; }
 
     public ReservationSortBy SortBy { get; init; } = ReservationSortBy.ArrivalDate;
+    
     public SortDirection SortDirection { get; init; } = SortDirection.Ascending;
 
     [Range(1, int.MaxValue)]

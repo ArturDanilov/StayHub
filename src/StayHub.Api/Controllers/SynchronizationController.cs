@@ -27,6 +27,7 @@ public sealed class SynchronizationController(ISynchronizationManager synchroniz
             SynchronizationError.SourceNotFound => NotFound("Source not found."),
             SynchronizationError.SourceDisabled => BadRequest("Source is disabled."),
             SynchronizationError.SourceUrlMissing => BadRequest("Source URL is not configured."),
+            SynchronizationError.AlreadyRunning => Conflict("Synchronization is already running for this source."),
             _ => StatusCode(StatusCodes.Status500InternalServerError)
         };
     }

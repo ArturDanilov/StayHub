@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StayHub.Business.Interfaces;
 using StayHub.Api.Common;
-using StayHub.Dal;
 using StayHub.Dal.Data;
 using StayHub.Domain.Models;
 

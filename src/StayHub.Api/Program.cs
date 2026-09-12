@@ -13,6 +13,7 @@ using StayHub.Api.Common;
 using StayHub.Api.Health;
 using StayHub.Api.Seed;
 using StayHub.Api.Integration;
+using StayHub.Api.Synchronization;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -85,7 +86,16 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 builder.Services.AddScoped<IUserManager, UserManager>();
 builder.Services.AddScoped<ISynchronizationRunRepository, SynchronizationRunRepository>();
+builder.Services.AddSingleton<ISynchronizationExecutionGate, SynchronizationExecutionGate>();
 builder.Services.AddScoped<ISynchronizationManager, SynchronizationManager>();
+builder.Services.AddScoped<AutomaticSynchronizationJob>();
+builder.Services
+    .AddOptions<AutomaticSynchronizationOptions>()
+    .Bind(builder.Configuration.GetSection(AutomaticSynchronizationOptions.SectionName))
+    .Validate(options => options.IntervalMinutes > 0, "IntervalMinutes must be greater than zero.")
+    .Validate(options => options.InitialDelaySeconds >= 0, "InitialDelaySeconds cannot be negative.")
+    .ValidateOnStart();
+builder.Services.AddHostedService<ReservationSynchronizationWorker>();
 builder.Services.AddHttpClient<IExternalReservationClient, ExternalReservationClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(15);

@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using StayHub.Business.Interfaces;
 using StayHub.Contracts.Synchronization;
 

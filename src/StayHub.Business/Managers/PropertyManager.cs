@@ -7,8 +7,7 @@ namespace StayHub.Business.Managers;
 public sealed class PropertyManager(IPropertyRepository repository)
     : IPropertyManager
 {
-    public async Task<IReadOnlyList<PropertyResponse>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<PropertyResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var properties = await repository.GetAllAsync(cancellationToken);
 

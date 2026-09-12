@@ -7,8 +7,7 @@ namespace StayHub.Business.Managers;
 public sealed class SourceManager(ISourceRepository repository)
     : ISourceManager  
 {
-    public async Task<IReadOnlyList<SourceResponse>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<SourceResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var sources = await repository.GetAllAsync(cancellationToken);
 
