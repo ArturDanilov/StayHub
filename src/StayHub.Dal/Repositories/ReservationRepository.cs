@@ -83,6 +83,36 @@ public sealed class ReservationRepository(StayHubDbContext dbContext)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
+    public Task<Reservation?> GetByExternalIdAsync(
+        int sourceId,
+        string externalId,
+        CancellationToken cancellationToken = default)
+    {
+        return dbContext.Reservations
+            .Include(x => x.Source)
+            .Include(x => x.Property)
+            .Include(x => x.Guest)
+            .FirstOrDefaultAsync(
+                x => x.SourceId == sourceId && x.ExternalId == externalId,
+                cancellationToken);
+    }
+
+    public Task<bool> HasDateConflictAsync(
+        int propertyId,
+        DateOnly arrivalDate,
+        DateOnly departureDate,
+        int? excludedReservationId = null,
+        CancellationToken cancellationToken = default)
+    {
+        return dbContext.Reservations.AnyAsync(
+            x => x.PropertyId == propertyId
+                 && x.Status != ReservationStatus.Cancelled
+                 && x.ArrivalDate < departureDate
+                 && arrivalDate < x.DepartureDate
+                 && (!excludedReservationId.HasValue || x.Id != excludedReservationId.Value),
+            cancellationToken);
+    }
+
     public Task<bool> ExternalIdExistsAsync(
         int sourceId,
         string externalId,

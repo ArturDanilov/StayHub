@@ -30,6 +30,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StayHub.Mapping", "src\Stay
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StayHub.Mobile", "src\StayHub.Mobile\StayHub.Mobile.csproj", "{A06456F7-E60C-4312-AE75-D994477E51A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StayHub.MockPms", "src\StayHub.MockPms\StayHub.MockPms.csproj", "{2B072EF4-4DE4-4205-A9E8-EE875C957F43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StayHub.Business.Tests", "tests\StayHub.Business.Tests\StayHub.Business.Tests.csproj", "{D64A7174-A0A7-4582-8735-B42A349F7A80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,5 +68,13 @@ Global
 		{A06456F7-E60C-4312-AE75-D994477E51A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A06456F7-E60C-4312-AE75-D994477E51A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A06456F7-E60C-4312-AE75-D994477E51A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B072EF4-4DE4-4205-A9E8-EE875C957F43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B072EF4-4DE4-4205-A9E8-EE875C957F43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B072EF4-4DE4-4205-A9E8-EE875C957F43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B072EF4-4DE4-4205-A9E8-EE875C957F43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D64A7174-A0A7-4582-8735-B42A349F7A80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D64A7174-A0A7-4582-8735-B42A349F7A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D64A7174-A0A7-4582-8735-B42A349F7A80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D64A7174-A0A7-4582-8735-B42A349F7A80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -170,6 +170,52 @@ namespace StayHub.Dal.Migrations
                     b.ToTable("Sources");
                 });
 
+            modelBuilder.Entity("StayHub.Domain.Models.SynchronizationRun", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ConflictCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("FailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SourceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UnchangedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UpdatedCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceId", "StartedAtUtc");
+
+                    b.ToTable("SynchronizationRuns");
+                });
+
             modelBuilder.Entity("StayHub.Domain.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -247,6 +293,17 @@ namespace StayHub.Dal.Migrations
                     b.Navigation("Source");
                 });
 
+            modelBuilder.Entity("StayHub.Domain.Models.SynchronizationRun", b =>
+                {
+                    b.HasOne("StayHub.Domain.Models.Source", "Source")
+                        .WithMany("SynchronizationRuns")
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Source");
+                });
+
             modelBuilder.Entity("StayHub.Domain.Models.Guest", b =>
                 {
                     b.Navigation("Reservations");
@@ -260,6 +317,8 @@ namespace StayHub.Dal.Migrations
             modelBuilder.Entity("StayHub.Domain.Models.Source", b =>
                 {
                     b.Navigation("Reservations");
+
+                    b.Navigation("SynchronizationRuns");
                 });
 #pragma warning restore 612, 618
         }

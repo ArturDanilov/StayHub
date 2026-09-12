@@ -13,6 +13,8 @@ a physical iPhone and stores its data in Azure.
 - Property, guest, source, user, and reservation workflows
 - Reservation search, filtering, sorting, and server-side pagination
 - Reservation validation and Admin-only deletion
+- Idempotent reservation synchronization from a deterministic Mock PMS
+- Synchronization history with conflict and failure reporting
 - Deterministic demonstration data
 - Liveness and database-readiness health checks
 - Native .NET MAUI client for iOS
@@ -34,8 +36,10 @@ flowchart LR
     Business[Business managers]
     Repositories[EF Core repositories]
     Database[(SQL Server / Azure SQL)]
+    MockPms[Mock PMS API]
 
     Mobile -->|HTTPS + JWT| API
+    API -->|HTTP import| MockPms
     API --> Business
     Business --> Repositories
     Repositories --> Database
@@ -138,4 +142,5 @@ user-secrets locally and Azure Container App secrets in the cloud.
 - [Authentication](docs/authentication.md)
 - [Domain model](docs/domain.md)
 - [Azure deployment](docs/AZURE_DEPLOYMENT.md)
+- [Reservation synchronization](docs/SYNCHRONIZATION.md)
 - [Roadmap](docs/roadmap.md)

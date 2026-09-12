@@ -10,6 +10,10 @@ public interface IPropertyRepository
         int id,
         CancellationToken cancellationToken = default);
 
+    Task<Property?> GetByNameAsync(
+        string name,
+        CancellationToken cancellationToken = default);
+
     Task<Property> AddAsync(
         Property property,
         CancellationToken cancellationToken = default);

@@ -11,6 +11,10 @@ public interface IGuestRepository
         int id,
         CancellationToken cancellationToken = default);
 
+    Task<Guest?> GetByEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default);
+
     Task<bool> EmailExistsAsync(
         string email,
         int? excludedGuestId = null,

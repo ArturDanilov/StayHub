@@ -34,6 +34,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IReservationsService, ReservationsService>();
         builder.Services.AddSingleton<IReservationFormService, ReservationFormService>();
         builder.Services.AddSingleton<IUsersService, UsersService>();
+        builder.Services.AddSingleton<ISynchronizationService, SynchronizationService>();
         builder.Services.AddSingleton<IAppNavigator, AppNavigator>();
 
         builder.Services.AddTransient<LoginPage>();
@@ -42,6 +43,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ReservationsPage>();
         builder.Services.AddTransient<AssistantPage>();
         builder.Services.AddTransient<UsersPage>();
+        builder.Services.AddTransient<SynchronizationPage>();
 
         return builder.Build();
     }

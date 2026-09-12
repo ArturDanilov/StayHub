@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StayHub.Mobile.Views.SynchronizationPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:StayHub.Mobile.Models"
+    Title="Sync">
+
+    <ContentPage.Resources>
+        <Style x:Key="MetricBorder" TargetType="Border">
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F4F7F8, Dark=#252525}" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+            <Setter Property="Padding" Value="10,8" />
+        </Style>
+        <Style x:Key="MetricNumber" TargetType="Label">
+            <Setter Property="FontFamily" Value="OpenSansSemibold" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="MetricCaption" TargetType="Label">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid Padding="20,16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="14">
+        <VerticalStackLayout Spacing="4">
+            <Label Text="Reservation sync" Style="{StaticResource PageTitle}" />
+            <Label Text="Import reservations from an external PMS" Style="{StaticResource Caption}" />
+        </VerticalStackLayout>
+
+        <Border Grid.Row="1" Style="{StaticResource Card}">
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Source" Style="{StaticResource SectionTitle}" />
+                <Picker x:Name="SourcePicker" Title="Choose a PMS source" />
+                <Grid>
+                    <Button x:Name="SyncButton" Text="Sync now" Clicked="OnSyncClicked" />
+                    <ActivityIndicator
+                        x:Name="SyncIndicator"
+                        Margin="0,0,18,0"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        InputTransparent="True"
+                        IsRunning="False"
+                        IsVisible="False"
+                        Color="White" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+
+        <Border x:Name="ResultCard" Grid.Row="2" Style="{StaticResource Card}" IsVisible="False">
+            <VerticalStackLayout Spacing="10">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Label Text="Latest result" Style="{StaticResource SectionTitle}" />
+                    <Border Grid.Column="1" BackgroundColor="{Binding StatusColor}" StrokeThickness="0"
+                            StrokeShape="RoundRectangle 11" Padding="10,5">
+                        <Label Text="{Binding StatusDisplayName}" TextColor="White" FontSize="11" />
+                    </Border>
+                </Grid>
+                <Label Text="{Binding SourceName}" FontFamily="OpenSansSemibold" />
+                <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="6">
+                    <Border Style="{StaticResource MetricBorder}">
+                        <VerticalStackLayout Spacing="1">
+                            <Label Text="{Binding CreatedLabel}" Style="{StaticResource MetricNumber}" TextColor="#356859" />
+                            <Label Text="Created" Style="{StaticResource MetricCaption}" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource MetricBorder}">
+                        <VerticalStackLayout Spacing="1">
+                            <Label Text="{Binding UpdatedLabel}" Style="{StaticResource MetricNumber}" TextColor="#19788C" />
+                            <Label Text="Updated" Style="{StaticResource MetricCaption}" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource MetricBorder}">
+                        <VerticalStackLayout Spacing="1">
+                            <Label Text="{Binding UnchangedLabel}" Style="{StaticResource MetricNumber}" />
+                            <Label Text="Same" Style="{StaticResource MetricCaption}" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="3" Style="{StaticResource MetricBorder}">
+                        <VerticalStackLayout Spacing="1">
+                            <Label Text="{Binding ConflictLabel}" Style="{StaticResource MetricNumber}" TextColor="#C77800" />
+                            <Label Text="Conflicts" Style="{StaticResource MetricCaption}" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Column="4" Style="{StaticResource MetricBorder}">
+                        <VerticalStackLayout Spacing="1">
+                            <Label Text="{Binding FailedLabel}" Style="{StaticResource MetricNumber}" TextColor="#B3261E" />
+                            <Label Text="Failed" Style="{StaticResource MetricCaption}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+                <Label Text="{Binding ConflictDescription}" TextColor="#C77800" IsVisible="{Binding HasConflicts}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Errors}" IsVisible="{Binding HasErrors}" Spacing="4">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Label Text="{Binding .}" TextColor="#B3261E" FontSize="12" />
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+                <Button Text="View reservations" Clicked="OnViewReservationsClicked" />
+            </VerticalStackLayout>
+        </Border>
+
+        <Grid Grid.Row="3">
+            <RefreshView x:Name="RunsRefreshView" Refreshing="OnRefreshing">
+                <CollectionView x:Name="RunsCollection" ItemsSource="{Binding Runs}">
+                    <CollectionView.Header>
+                        <Label Text="Recent runs" Style="{StaticResource SectionTitle}" Margin="0,0,0,10" />
+                    </CollectionView.Header>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:SynchronizationRunOverview">
+                            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnRunTapped" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="8">
+                                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                        <Label Text="{Binding SourceName}" Style="{StaticResource SectionTitle}" />
+                                        <Border Grid.Column="1" BackgroundColor="{Binding StatusColor}"
+                                                StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="9,5">
+                                            <Label Text="{Binding StatusDisplayName}" TextColor="White" FontSize="11" />
+                                        </Border>
+                                        <Label Grid.Column="2" Text="{Binding ExpansionIndicator}" FontSize="18"
+                                               VerticalTextAlignment="Center" />
+                                    </Grid>
+                                    <Label Text="{Binding StartedLabel}" Style="{StaticResource Caption}" />
+                                    <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="5">
+                                        <Label Text="{Binding CreatedLabel, StringFormat='Created {0}'}" FontSize="11" />
+                                        <Label Grid.Column="1" Text="{Binding UpdatedLabel, StringFormat='Updated {0}'}" FontSize="11" />
+                                        <Label Grid.Column="2" Text="{Binding UnchangedLabel, StringFormat='Same {0}'}" FontSize="11" />
+                                        <Label Grid.Column="3" Text="{Binding ConflictLabel, StringFormat='Conflict {0}'}" FontSize="11" TextColor="#C77800" />
+                                        <Label Grid.Column="4" Text="{Binding FailedLabel, StringFormat='Failed {0}'}" FontSize="11" TextColor="#B3261E" />
+                                    </Grid>
+
+                                    <VerticalStackLayout IsVisible="{Binding IsExpanded}" Spacing="7" Margin="0,5,0,0">
+                                        <BoxView HeightRequest="1" Opacity="0.15" />
+                                        <Label Text="{Binding CompletedLabel}" Style="{StaticResource Caption}" />
+                                        <Label Text="{Binding DurationLabel}" Style="{StaticResource Caption}" />
+                                        <Label Text="{Binding ConflictDescription}" TextColor="#C77800"
+                                               FontSize="12" IsVisible="{Binding HasConflicts}" />
+                                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Errors}"
+                                                             IsVisible="{Binding HasErrors}" Spacing="4">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="x:String">
+                                                    <Label Text="{Binding .}" TextColor="#B3261E" FontSize="12" />
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
+                                        <Button Text="View reservations" Clicked="OnViewReservationsClicked" />
+                                    </VerticalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+            <VerticalStackLayout x:Name="ErrorPanel" IsVisible="False" Spacing="12"
+                                 HorizontalOptions="Center" VerticalOptions="Center">
+                <Label x:Name="ErrorLabel" Style="{StaticResource Caption}" HorizontalTextAlignment="Center" />
+                <Button Text="Try again" Clicked="OnRetryClicked" />
+            </VerticalStackLayout>
+            <Label x:Name="EmptyLabel" IsVisible="False" Text="No synchronization runs yet."
+                   Style="{StaticResource Caption}" HorizontalOptions="Center" VerticalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

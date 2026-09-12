@@ -12,6 +12,7 @@ public partial class AppShell : Shell
         PropertiesPage propertiesPage,
         ReservationsPage reservationsPage,
         AssistantPage assistantPage,
+        SynchronizationPage synchronizationPage,
         UsersPage usersPage,
         IAuthService authService)
     {
@@ -20,13 +21,17 @@ public partial class AppShell : Shell
         PropertiesContent.Content = propertiesPage;
         ReservationsContent.Content = reservationsPage;
         AssistantContent.Content = assistantPage;
+        SynchronizationContent.Content = synchronizationPage;
         UsersContent.Content = usersPage;
+        SynchronizationContent.IsVisible = false;
         UsersContent.IsVisible = false;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        UsersContent.IsVisible = await _authService.GetRoleAsync() == UserRoles.Admin;
+        var role = await _authService.GetRoleAsync();
+        SynchronizationContent.IsVisible = role is UserRoles.Admin or UserRoles.Receptionist;
+        UsersContent.IsVisible = role == UserRoles.Admin;
     }
 }

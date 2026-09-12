@@ -26,6 +26,13 @@ public sealed class GuestRepository(StayHubDbContext dbContext)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
+    public Task<Guest?> GetByEmailAsync(
+        string email,
+        CancellationToken cancellationToken = default)
+    {
+        return dbContext.Guests.FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+    }
+
     public Task<bool> EmailExistsAsync(
         string email,
         int? excludedGuestId = null,

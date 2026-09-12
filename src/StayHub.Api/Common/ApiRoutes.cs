@@ -42,4 +42,11 @@ public class ApiRoutes
         public const string Status = "{id:int}/status";
         public const string Password = "{id:int}/password";
     }
+
+    public static class Synchronization
+    {
+        public const string Base = $"{Api}/synchronization";
+        public const string Source = "sources/{sourceId:int}";
+        public const string Runs = "runs";
+    }
 }

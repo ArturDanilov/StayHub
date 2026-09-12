@@ -29,7 +29,11 @@ public static class DatabaseSeeder
             return;
 
         if (await db.Properties.AnyAsync(cancellationToken))
+        {
+            await EnsureMockPmsSourceAsync(db, cancellationToken);
+            await EnsureMockPmsPropertiesAsync(db, cancellationToken);
             return;
+        }
 
         var createdAtUtc = new DateTime(2026, 7, 1, 12, 0, 0, DateTimeKind.Utc);
         var referenceDate = new DateOnly(2026, 7, 15);
@@ -224,7 +228,7 @@ public static class DatabaseSeeder
             {
                 Name = "Mock PMS",
                 SourceType = "PMS",
-                Url = "https://mock-pms.local",
+                Url = "http://localhost:5095",
                 IsEnabled = true,
                 CreatedAtUtc = createdAtUtc
             }
@@ -300,6 +304,63 @@ public static class DatabaseSeeder
         db.Reservations.AddRange(reservations);
 
         #endregion
+
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
+    private static async Task EnsureMockPmsSourceAsync(
+        StayHubDbContext db,
+        CancellationToken cancellationToken)
+    {
+        var mockPms = await db.Sources.FirstOrDefaultAsync(
+            source => source.Name == "Mock PMS",
+            cancellationToken);
+
+        if (mockPms is null)
+        {
+            db.Sources.Add(new Source
+            {
+                Name = "Mock PMS",
+                SourceType = "PMS",
+                Url = "http://localhost:5095",
+                IsEnabled = true,
+                CreatedAtUtc = new DateTime(2026, 7, 1, 12, 0, 0, DateTimeKind.Utc)
+            });
+        }
+        else
+        {
+            mockPms.SourceType = "PMS";
+            mockPms.Url = "http://localhost:5095";
+            mockPms.IsEnabled = true;
+        }
+
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
+    private static async Task EnsureMockPmsPropertiesAsync(
+        StayHubDbContext db,
+        CancellationToken cancellationToken)
+    {
+        var requiredProperties = new[]
+        {
+            new { Name = "Albrecht-Thaer-Straße 2", City = "Nürnberg" },
+            new { Name = "Planegger Straße 112", City = "München" }
+        };
+        var existingNames = await db.Properties
+            .Where(property => requiredProperties.Select(required => required.Name).Contains(property.Name))
+            .Select(property => property.Name)
+            .ToListAsync(cancellationToken);
+
+        foreach (var property in requiredProperties.Where(property => !existingNames.Contains(property.Name)))
+        {
+            db.Properties.Add(new Property
+            {
+                Name = property.Name,
+                City = property.City,
+                CountryCode = "DE",
+                CreatedAtUtc = new DateTime(2026, 7, 1, 12, 0, 0, DateTimeKind.Utc)
+            });
+        }
 
         await db.SaveChangesAsync(cancellationToken);
     }

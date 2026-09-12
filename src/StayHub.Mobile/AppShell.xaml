@@ -23,6 +23,11 @@
             Route="Assistant" />
 
         <ShellContent
+            x:Name="SynchronizationContent"
+            Title="Sync"
+            Route="Synchronization" />
+
+        <ShellContent
             x:Name="UsersContent"
             Title="Users"
             Route="Users" />

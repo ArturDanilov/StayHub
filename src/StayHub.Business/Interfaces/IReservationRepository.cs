@@ -13,6 +13,18 @@ public interface IReservationRepository
         int id,
         CancellationToken cancellationToken = default);
 
+    Task<Reservation?> GetByExternalIdAsync(
+        int sourceId,
+        string externalId,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> HasDateConflictAsync(
+        int propertyId,
+        DateOnly arrivalDate,
+        DateOnly departureDate,
+        int? excludedReservationId = null,
+        CancellationToken cancellationToken = default);
+
     Task<bool> ExternalIdExistsAsync(
         int sourceId,
         string externalId,
