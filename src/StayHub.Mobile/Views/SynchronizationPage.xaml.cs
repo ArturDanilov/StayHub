@@ -80,7 +80,10 @@ public partial class SynchronizationPage : ContentPage
         }
 
         SyncButton.IsEnabled = false;
+        SourcePicker.IsEnabled = false;
         SyncButton.Text = "Synchronizing…";
+        SyncIndicator.IsVisible = true;
+        SyncIndicator.IsRunning = true;
         ErrorPanel.IsVisible = false;
         try
         {
@@ -100,19 +103,27 @@ public partial class SynchronizationPage : ContentPage
         finally
         {
             SyncButton.IsEnabled = true;
+            SourcePicker.IsEnabled = true;
             SyncButton.Text = "Sync now";
+            SyncIndicator.IsRunning = false;
+            SyncIndicator.IsVisible = false;
         }
     }
 
     private void ShowResult(SynchronizationRunOverview result)
     {
-        ResultTitle.Text = $"{result.SourceName}: {result.Status}";
-        ResultSummary.Text = result.Summary;
-        ResultDetails.Text = result.Details;
-        ResultError.Text = result.ErrorMessage;
-        ResultError.IsVisible = !string.IsNullOrWhiteSpace(result.ErrorMessage);
+        ResultCard.BindingContext = result;
         ResultCard.IsVisible = true;
     }
+
+    private void OnRunTapped(object? sender, TappedEventArgs e)
+    {
+        if (e.Parameter is SynchronizationRunOverview run)
+            run.IsExpanded = !run.IsExpanded;
+    }
+
+    private async void OnViewReservationsClicked(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync("//Reservations");
 
     private void ShowError(string message)
     {

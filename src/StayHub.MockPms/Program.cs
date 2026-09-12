@@ -15,8 +15,8 @@ var reservations = new List<ExternalReservationResponse>
         "toni.danilov@example.com",
         "+49 151 00000003",
         new DateOnly(2026, 7, 25),
-        new DateOnly(2026, 7, 29),
-        ReservationStatusContract.Confirmed),
+        new DateOnly(2026, 7, 30),
+        ReservationStatusContract.CheckedIn),
     new(
         "MOCK-1002",
         "StayHub Berlin Mitte",
@@ -39,8 +39,7 @@ var reservations = new List<ExternalReservationResponse>
         ReservationStatusContract.Confirmed)
 };
 
-app.MapGet("/api/reservations", () => Results.Ok(reservations))
-    .WithName("GetReservations");
+app.MapGet("/api/reservations", () => Results.Ok(reservations)).WithName("GetReservations");
 app.MapGet("/health/live", () => Results.Ok(new { status = "Healthy" }));
 
 app.Run();
