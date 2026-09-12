@@ -128,6 +128,9 @@ configuration when an API demonstration is required.
 
 Deployment configuration, required environment variables, and operational
 notes are documented in [Azure deployment](docs/AZURE_DEPLOYMENT.md).
+Copy-and-paste commands for local startup, health checks, API requests,
+synchronization, and Azure operations are in the [operations
+runbook](docs/RUNBOOK.md).
 
 ## Security
 
@@ -141,6 +144,7 @@ user-secrets locally and Azure Container App secrets in the cloud.
 - [Architecture](docs/ARCHITECTURE.md)
 - [Authentication](docs/authentication.md)
 - [Domain model](docs/domain.md)
+- [Operations runbook](docs/RUNBOOK.md)
 - [Azure deployment](docs/AZURE_DEPLOYMENT.md)
 - [Reservation synchronization](docs/SYNCHRONIZATION.md)
 - [Roadmap](docs/roadmap.md)

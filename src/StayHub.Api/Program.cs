@@ -98,7 +98,8 @@ builder.Services
 builder.Services.AddHostedService<ReservationSynchronizationWorker>();
 builder.Services.AddHttpClient<IExternalReservationClient, ExternalReservationClient>(client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(15);
+    // A scale-to-zero PMS container can need more than 15 seconds for its first cold start.
+    client.Timeout = TimeSpan.FromSeconds(60);
 });
 
 var jwtOptions = builder.Configuration

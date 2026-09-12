@@ -68,6 +68,11 @@ public sealed class SynchronizationManager(
                 : SynchronizationStatus.CompletedWithErrors;
             run.ErrorMessage = JoinErrors(errors);
         }
+        catch (OperationCanceledException exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            run.Status = SynchronizationStatus.Failed;
+            run.ErrorMessage = Truncate(exception.Message);
+        }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
             run.Status = SynchronizationStatus.Failed;

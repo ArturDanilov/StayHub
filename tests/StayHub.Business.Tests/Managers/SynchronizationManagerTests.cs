@@ -217,6 +217,23 @@ public sealed class SynchronizationManagerTests
         Assert.NotNull(result.Value.CompletedAtUtc);
     }
 
+    [Fact]
+    public async Task SynchronizeAsync_ExternalPmsTimeout_MarksRunAsFailed()
+    {
+        var context = new TestContext();
+        context.ExternalClient.Exception = new TaskCanceledException("The external PMS request timed out.");
+
+        var result = await context.Manager.SynchronizeAsync(
+            context.Source.Id,
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Equal("Failed", result.Value.Status);
+        Assert.Equal("The external PMS request timed out.", result.Value.ErrorMessage);
+        Assert.NotNull(result.Value.CompletedAtUtc);
+    }
+
     private static ExternalReservationResponse CreateExternalReservation(
         string externalId = "MOCK-1001",
         string propertyName = "StayHub Lake Resort",
