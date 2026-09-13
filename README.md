@@ -127,7 +127,10 @@ phone numbers are not sent to the model. The model never connects directly to
 SQL Server and cannot modify StayHub data.
 
 The assistant is enabled in Development and disabled in Production by default.
-This keeps the Azure MVP unchanged until a production AI provider is chosen.
+Production can use Azure AI Foundry after its endpoint, deployment name, and
+secret API key are configured. StayHub limits response length and the daily
+number of assistant requests. See
+[Azure deployment](docs/AZURE_DEPLOYMENT.md#azure-ai-foundry-assistant).
 
 ## Azure deployment
 

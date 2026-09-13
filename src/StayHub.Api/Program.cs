@@ -6,6 +6,7 @@ using StayHub.Dal.Data;
 using StayHub.Dal.Repositories;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using StayHub.Api.Authentication;
@@ -27,8 +28,13 @@ if (string.IsNullOrWhiteSpace(connectionString))
 }
 
 builder.Services.AddControllers();
+var assistantConfiguration = builder.Configuration
+    .GetSection(AiAssistantOptions.SectionName)
+    .Get<AiAssistantOptions>() ?? new AiAssistantOptions();
 builder.Services.AddRateLimiter(options =>
 {
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
     options.AddPolicy("login", httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
             httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -38,6 +44,13 @@ builder.Services.AddRateLimiter(options =>
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0
             }));
+
+    options.AddFixedWindowLimiter("assistant", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = assistantConfiguration.DailyRequestLimit;
+        limiterOptions.Window = TimeSpan.FromDays(1);
+        limiterOptions.QueueLimit = 0;
+    });
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks()
@@ -78,16 +91,41 @@ builder.Services.AddScoped<IAssistantManager, AssistantManager>();
 builder.Services
     .AddOptions<AiAssistantOptions>()
     .Bind(builder.Configuration.GetSection(AiAssistantOptions.SectionName))
-    .Validate(options => Uri.TryCreate(options.BaseAddress, UriKind.Absolute, out _),
+    .Validate(options => AiAssistantProviders.IsSupported(options.Provider),
+        "AiAssistant Provider must be Ollama or AzureFoundry.")
+    .Validate(options => !options.Enabled || Uri.TryCreate(options.BaseAddress, UriKind.Absolute, out _),
         "AiAssistant BaseAddress must be an absolute URL.")
-    .Validate(options => !string.IsNullOrWhiteSpace(options.Model), "AiAssistant Model is required.")
+    .Validate(options => !options.Enabled || !string.IsNullOrWhiteSpace(options.Model),
+        "AiAssistant Model is required.")
+    .Validate(options => !options.Enabled
+                         || !options.Provider.Equals(AiAssistantProviders.AzureFoundry, StringComparison.OrdinalIgnoreCase)
+                         || !string.IsNullOrWhiteSpace(options.ApiKey),
+        "AiAssistant ApiKey is required for AzureFoundry.")
     .Validate(options => options.TimeoutSeconds > 0, "AiAssistant TimeoutSeconds must be positive.")
+    .Validate(options => options.MaxOutputTokens is > 0 and <= 2000,
+        "AiAssistant MaxOutputTokens must be between 1 and 2000.")
+    .Validate(options => options.DailyRequestLimit is > 0 and <= 1000,
+        "AiAssistant DailyRequestLimit must be between 1 and 1000.")
     .ValidateOnStart();
-builder.Services.AddHttpClient<IAssistantClient, OllamaAssistantClient>((services, client) =>
+builder.Services.AddHttpClient<OllamaAssistantClient>((services, client) =>
 {
     var options = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<AiAssistantOptions>>().Value;
     client.BaseAddress = new Uri(options.BaseAddress.TrimEnd('/') + "/");
     client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+});
+builder.Services.AddHttpClient<AzureFoundryAssistantClient>((services, client) =>
+{
+    var options = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<AiAssistantOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseAddress.TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+    client.DefaultRequestHeaders.Add("api-key", options.ApiKey);
+});
+builder.Services.AddScoped<IAssistantClient>(services =>
+{
+    var options = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<AiAssistantOptions>>().Value;
+    return options.Provider.Equals(AiAssistantProviders.AzureFoundry, StringComparison.OrdinalIgnoreCase)
+        ? services.GetRequiredService<AzureFoundryAssistantClient>()
+        : services.GetRequiredService<OllamaAssistantClient>();
 });
 
 builder.Services.AddScoped<ISourceRepository, SourceRepository>();
@@ -183,8 +221,8 @@ if (builder.Configuration.GetValue("DatabaseInitialization:ApplyMigrations", tru
     await DatabaseSeeder.SeedAsync(app.Services);
 }
 
-app.UseRateLimiter();
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 
 if (app.Environment.IsDevelopment()

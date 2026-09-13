@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using StayHub.Api.Common;
 using StayHub.Business.Interfaces;
 using StayHub.Business.Results;
@@ -10,6 +11,7 @@ namespace StayHub.Api.Controllers;
 [ApiController]
 [Route(ApiRoutes.Assistant.Base)]
 [Authorize(Policy = AuthorizationPolicies.ReadAccess)]
+[EnableRateLimiting("assistant")]
 public sealed class AssistantController(IAssistantManager assistantManager) : ControllerBase
 {
     [HttpPost(ApiRoutes.Assistant.Chat)]
