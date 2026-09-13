@@ -6,27 +6,39 @@ namespace StayHub.Mobile;
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate
 {
-    protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+    protected override MauiApp CreateMauiApp() =>
+        MauiProgram.CreateMauiApp();
 
-    public override bool FinishedLaunching(UIApplication application, NSDictionary? launchOptions)
+    public override bool FinishedLaunching(
+        UIApplication application,
+        NSDictionary? launchOptions)
     {
-        ConfigureTabBar();
-        return base.FinishedLaunching(application, launchOptions);
+        var result = base.FinishedLaunching(application, launchOptions);
+
+        AddKeyboardDismissGesture();
+
+        return result;
     }
 
-    private static void ConfigureTabBar()
+    private static void AddKeyboardDismissGesture()
     {
-        var tabBar = UITabBar.Appearance;
-        tabBar.ItemPositioning = UITabBarItemPositioning.Fill;
-        tabBar.ItemSpacing = 0;
+        var window = UIApplication.SharedApplication
+            .ConnectedScenes
+            .OfType<UIWindowScene>()
+            .SelectMany(scene => scene.Windows)
+            .FirstOrDefault(window => window.IsKeyWindow);
 
-        var item = UITabBarItem.Appearance;
-        item.TitlePositionAdjustment = new UIOffset(0, -7);
-        var attributes = new UIStringAttributes
+        if (window is null)
+            return;
+
+        var tapGesture = new UITapGestureRecognizer(() =>
         {
-            Font = UIFont.SystemFontOfSize(14, UIFontWeight.Semibold)
+            window.EndEditing(true);
+        })
+        {
+            CancelsTouchesInView = false
         };
-        item.SetTitleTextAttributes(attributes, UIControlState.Normal);
-        item.SetTitleTextAttributes(attributes, UIControlState.Selected);
+
+        window.AddGestureRecognizer(tapGesture);
     }
 }

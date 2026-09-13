@@ -11,12 +11,28 @@ public static class MauiProgram
     {
         var apiSettings = ApiSettings.Load();
         var builder = MauiApp.CreateBuilder();
+
         builder
             .UseMauiApp<App>()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            })
+            .ConfigureMauiHandlers(handlers =>
+            {
+#if IOS
+                handlers.AddHandler(
+                    typeof(Shell),
+                    typeof(StayHubShellRenderer));
+
+                Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(
+                    "RemoveInputAccessoryView",
+                    (handler, view) =>
+                    {
+                        handler.PlatformView.InputAccessoryView = null;
+                    });
+#endif
             });
 
 #if DEBUG
@@ -29,12 +45,14 @@ public static class MauiProgram
             BaseAddress = new Uri(apiSettings.BaseAddress),
             Timeout = TimeSpan.FromSeconds(15)
         });
+
         builder.Services.AddSingleton<IAuthService, AuthService>();
         builder.Services.AddSingleton<IPropertiesService, PropertiesService>();
         builder.Services.AddSingleton<IReservationsService, ReservationsService>();
         builder.Services.AddSingleton<IReservationFormService, ReservationFormService>();
         builder.Services.AddSingleton<IUsersService, UsersService>();
         builder.Services.AddSingleton<ISynchronizationService, SynchronizationService>();
+
         builder.Services.AddSingleton<IAssistantService>(services =>
             new AssistantService(
                 new HttpClient
@@ -43,6 +61,7 @@ public static class MauiProgram
                     Timeout = TimeSpan.FromMinutes(2)
                 },
                 services.GetRequiredService<IAuthService>()));
+
         builder.Services.AddSingleton<IAppNavigator, AppNavigator>();
 
         builder.Services.AddTransient<LoginPage>();

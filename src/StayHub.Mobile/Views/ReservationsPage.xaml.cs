@@ -62,13 +62,22 @@ public partial class ReservationsPage : ContentPage
             _criteria.Page = result.Page;
             _totalPages = result.TotalPages;
             _hasLoaded = true;
+
             CountLabel.Text = result.TotalCount.ToString();
+
             SummaryLabel.Text = result.TotalCount == 0
-                ? "No reservations found"
+                ? "No bookings found"
                 : $"Showing {(result.Page - 1) * result.PageSize + 1}–{(result.Page - 1) * result.PageSize + result.Items.Count} of {result.TotalCount}";
-            PageLabel.Text = _totalPages == 0 ? "Page 0" : $"{result.Page} / {_totalPages}";
+
+            PageLabel.Text = _totalPages == 0
+                ? "Page 0"
+                : $"{result.Page} / {_totalPages}";
+
+            PaginationPanel.IsVisible = _totalPages > 1;
+
             PreviousButton.IsEnabled = result.Page > 1;
             NextButton.IsEnabled = result.Page < _totalPages;
+
             EmptyLabel.IsVisible = result.TotalCount == 0;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)

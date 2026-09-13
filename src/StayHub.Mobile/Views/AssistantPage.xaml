@@ -6,57 +6,129 @@
     xmlns:models="clr-namespace:StayHub.Mobile.Models"
     Title="Assistant">
 
-    <Grid Padding="20,16" RowDefinitions="Auto,*,Auto" RowSpacing="14">
+    <Grid
+        Padding="20,16"
+        RowDefinitions="Auto,*,Auto"
+        RowSpacing="14"
+        SafeAreaEdges="Container,SoftInput">
+
+        <!-- Header -->
         <VerticalStackLayout Spacing="4">
-            <Label Text="StayHub Assistant" Style="{StaticResource PageTitle}" />
-            <Label Text="Ask about reservations in Russian or German" Style="{StaticResource Caption}" />
+            <Label
+                Text="StayHub Assistant"
+                Style="{StaticResource PageTitle}" />
+
+            <Label
+                Text="Ask anything about your bookings"
+                Style="{StaticResource Caption}" />
         </VerticalStackLayout>
 
-        <CollectionView
-            x:Name="MessagesView"
-            Grid.Row="1"
-            ItemsSource="{Binding Messages}"
-            SelectionMode="None">
-            <CollectionView.EmptyView>
-                <VerticalStackLayout VerticalOptions="Center" Spacing="12">
-                    <Label Text="Ask a question about the current reservation data. The assistant has read-only access." HorizontalTextAlignment="Center" />
-                    <Button Text="Кто заезжает следующим?" Clicked="OnRussianSuggestionClicked" />
-                    <Button Text="Welche Gäste reisen als Nächstes an?" Clicked="OnGermanSuggestionClicked" />
-                </VerticalStackLayout>
-            </CollectionView.EmptyView>
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:AssistantMessageViewModel">
-                    <Border
-                        Margin="0,5"
-                        MaximumWidthRequest="340"
-                        Padding="14,10"
-                        StrokeShape="RoundRectangle 16"
-                        HorizontalOptions="Start"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
-                        <Border.Triggers>
-                            <DataTrigger TargetType="Border" Binding="{Binding IsUser}" Value="True">
-                                <Setter Property="HorizontalOptions" Value="End" />
-                                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
-                            </DataTrigger>
-                        </Border.Triggers>
-                        <Label Text="{Binding Content}" LineBreakMode="WordWrap" />
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+        <!-- Chat area -->
+        <Grid Grid.Row="1">
 
-        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
-            <Border Style="{StaticResource Card}" Padding="12,4">
+            <CollectionView
+                x:Name="MessagesView"
+                ItemsSource="{Binding Messages}"
+                SelectionMode="None"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill"
+                HorizontalScrollBarVisibility="Never">
+
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout
+                        Orientation="Vertical"
+                        ItemSpacing="0" />
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:AssistantMessageViewModel">
+                        <Border
+                            Margin="0,5"
+                            MaximumWidthRequest="340"
+                            Padding="14,10"
+                            StrokeShape="RoundRectangle 16"
+                            HorizontalOptions="Start"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+
+                            <Border.Triggers>
+                                <DataTrigger
+                                    TargetType="Border"
+                                    Binding="{Binding IsUser}"
+                                    Value="True">
+
+                                    <Setter
+                                        Property="HorizontalOptions"
+                                        Value="End" />
+
+                                    <Setter
+                                        Property="BackgroundColor"
+                                        Value="{StaticResource Primary}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+
+                            <Label
+                                Text="{Binding Content}"
+                                LineBreakMode="WordWrap" />
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+            <!-- Empty chat suggestions -->
+            <VerticalStackLayout
+                x:Name="EmptyState"
+                Spacing="12"
+                HorizontalOptions="Fill"
+                VerticalOptions="Center">
+
+                <Button
+                    Text="Кто заезжает следующим?"
+                    HorizontalOptions="Fill"
+                    Clicked="OnRussianSuggestionClicked" />
+
+                <Button
+                    Text="Welche Gäste reisen als Nächstes an?"
+                    HorizontalOptions="Fill"
+                    Clicked="OnGermanSuggestionClicked" />
+
+            </VerticalStackLayout>
+
+        </Grid>
+
+        <!-- Input -->
+        <Grid
+            Grid.Row="2"
+            ColumnDefinitions="*,Auto"
+            ColumnSpacing="10">
+
+            <Border
+                Style="{StaticResource Card}"
+                Padding="12,4">
+
                 <Entry
                     x:Name="QuestionEntry"
-                    Placeholder="Ask in Russian or German"
+                    Placeholder="Ask anything..."
                     ReturnType="Send"
                     Completed="OnSendClicked" />
             </Border>
-            <Grid Grid.Column="1" WidthRequest="72">
-                <Button x:Name="SendButton" Text="Send" Clicked="OnSendClicked" />
-                <ActivityIndicator x:Name="SendingIndicator" IsVisible="False" IsRunning="False" />
+
+            <Grid
+                Grid.Column="1"
+                WidthRequest="72">
+
+                <Button
+                    x:Name="SendButton"
+                    Text="Send"
+                    Clicked="OnSendClicked" />
+
+                <ActivityIndicator
+                    x:Name="SendingIndicator"
+                    IsVisible="False"
+                    IsRunning="False" />
+
             </Grid>
         </Grid>
+
     </Grid>
 </ContentPage>

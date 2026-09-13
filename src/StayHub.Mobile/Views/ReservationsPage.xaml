@@ -4,12 +4,12 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:StayHub.Mobile.Models"
-    Title="Reservations">
+    Title="Bookings">
 
     <Grid Padding="20,16,20,10" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
         <Grid ColumnDefinitions="*,Auto">
             <VerticalStackLayout Spacing="4">
-                <Label Text="Reservations" Style="{StaticResource PageTitle}" />
+                <Label Text="Bookings" Style="{StaticResource PageTitle}" />
                 <Label x:Name="SummaryLabel" Text="Live data from StayHub API" Style="{StaticResource Caption}" />
             </VerticalStackLayout>
             <Border Grid.Column="1" BackgroundColor="{StaticResource Secondary}" StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="12,7" VerticalOptions="Center">
@@ -68,10 +68,32 @@
             <Label x:Name="EmptyLabel" IsVisible="False" Text="No matching reservations." Style="{StaticResource Caption}" HorizontalOptions="Center" VerticalOptions="Center" />
         </Grid>
 
-        <Grid Grid.Row="3" ColumnDefinitions="*,Auto,*" ColumnSpacing="12" HeightRequest="44">
-            <Button x:Name="PreviousButton" Text="Previous" Clicked="OnPreviousClicked" />
-            <Label x:Name="PageLabel" Grid.Column="1" Text="Page 1" VerticalOptions="Center" HorizontalTextAlignment="Center" MinimumWidthRequest="80" />
-            <Button x:Name="NextButton" Grid.Column="2" Text="Next" Clicked="OnNextClicked" />
+        <Grid
+            x:Name="PaginationPanel"
+            Grid.Row="3"
+            ColumnDefinitions="*,Auto,*"
+            ColumnSpacing="12"
+            HeightRequest="44"
+            IsVisible="False">
+
+            <Button
+                x:Name="PreviousButton"
+                Text="Previous"
+                Clicked="OnPreviousClicked" />
+
+            <Label
+                x:Name="PageLabel"
+                Grid.Column="1"
+                Text="Page 1"
+                VerticalOptions="Center"
+                HorizontalTextAlignment="Center"
+                MinimumWidthRequest="80" />
+
+            <Button
+                x:Name="NextButton"
+                Grid.Column="2"
+                Text="Next"
+                Clicked="OnNextClicked" />
         </Grid>
     </Grid>
 </ContentPage>

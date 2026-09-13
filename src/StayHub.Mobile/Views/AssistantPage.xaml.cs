@@ -44,6 +44,7 @@ public partial class AssistantPage : ContentPage
             .ToList();
 
         Messages.Add(new AssistantMessageViewModel("user", question));
+        EmptyState.IsVisible = false;
         QuestionEntry.Text = string.Empty;
         SetSendingState(true);
 
