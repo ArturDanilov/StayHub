@@ -16,7 +16,7 @@ public sealed class AzureFoundryAssistantClient(
         CancellationToken cancellationToken = default)
     {
         if (!options.Value.Enabled)
-            throw new AssistantUnavailableException("AI assistant is disabled.");
+            throw new AssistantUnavailableException("Azure AI assistant is disabled.");
 
         try
         {
@@ -36,18 +36,20 @@ public sealed class AzureFoundryAssistantClient(
             var content = result?.Choices.FirstOrDefault()?.Message?.Content;
 
             if (string.IsNullOrWhiteSpace(content))
-                throw new AssistantUnavailableException("AI provider returned an empty response.");
+                throw new AssistantUnavailableException("Azure AI returned an empty response.");
 
             return content.Trim();
         }
         catch (AssistantUnavailableException) { throw; }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            throw new AssistantUnavailableException("AI provider did not respond in time.");
+            throw new AssistantUnavailableException("Azure AI did not respond in time. Try again later.");
         }
         catch (HttpRequestException exception)
         {
-            throw new AssistantUnavailableException("AI provider is unavailable.", exception);
+            throw new AssistantUnavailableException(
+                "Azure AI is temporarily unavailable. Try again later.",
+                exception);
         }
     }
 

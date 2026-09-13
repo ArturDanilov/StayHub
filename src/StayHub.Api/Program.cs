@@ -16,6 +16,7 @@ using StayHub.Api.Seed;
 using StayHub.Api.Integration;
 using StayHub.Api.Synchronization;
 using StayHub.Api.Assistant;
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,11 +46,21 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0
             }));
 
-    options.AddFixedWindowLimiter("assistant", limiterOptions =>
+    options.AddPolicy("assistant", httpContext =>
     {
-        limiterOptions.PermitLimit = assistantConfiguration.DailyRequestLimit;
-        limiterOptions.Window = TimeSpan.FromDays(1);
-        limiterOptions.QueueLimit = 0;
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var partitionKey = !string.IsNullOrWhiteSpace(userId)
+            ? $"user:{userId}"
+            : $"ip:{httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = assistantConfiguration.DailyRequestLimit,
+                Window = TimeSpan.FromDays(1),
+                QueueLimit = 0
+            });
     });
 });
 builder.Services.AddEndpointsApiExplorer();

@@ -14,7 +14,7 @@ public sealed class OllamaAssistantClient(HttpClient httpClient, IOptions<AiAssi
         CancellationToken cancellationToken = default)
     {
         if (!options.Value.Enabled)
-            throw new AssistantUnavailableException("AI assistant is disabled.");
+            throw new AssistantUnavailableException("The local Ollama assistant is disabled.");
 
         try
         {
@@ -27,18 +27,21 @@ public sealed class OllamaAssistantClient(HttpClient httpClient, IOptions<AiAssi
                 cancellationToken: cancellationToken);
 
             if (string.IsNullOrWhiteSpace(result?.Message?.Content))
-                throw new AssistantUnavailableException("AI provider returned an empty response.");
+                throw new AssistantUnavailableException("The local Ollama model returned an empty response.");
 
             return result.Message.Content.Trim();
         }
         catch (AssistantUnavailableException) { throw; }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            throw new AssistantUnavailableException("AI provider did not respond in time.");
+            throw new AssistantUnavailableException(
+                "The local Ollama model did not respond in time. Make sure Ollama is running and try again.");
         }
         catch (HttpRequestException exception)
         {
-            throw new AssistantUnavailableException("AI provider is unavailable.", exception);
+            throw new AssistantUnavailableException(
+                "Cannot connect to the local Ollama model. Start Ollama and try again.",
+                exception);
         }
     }
 

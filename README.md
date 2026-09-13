@@ -156,6 +156,24 @@ The first request can take a few seconds while the application scales from
 zero. Swagger can be enabled temporarily through the Container App
 configuration when an API demonstration is required.
 
+### Wake up Azure services
+
+Open these links on a phone and wait for a response before signing in:
+
+- [API readiness (API and database)](https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/ready)
+- [API liveness](https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/live)
+- [Mock PMS liveness](https://stayhub-mockpms.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/live)
+- [Mock PMS reservations](https://stayhub-mockpms.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/api/reservations)
+
+The same checks from a terminal:
+
+```bash
+curl -i "https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/ready"
+curl -i "https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/live"
+curl -i "https://stayhub-mockpms.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/live"
+curl -sS "https://stayhub-mockpms.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/api/reservations"
+```
+
 Deployment configuration, required environment variables, and operational
 notes are documented in [Azure deployment](docs/AZURE_DEPLOYMENT.md).
 Copy-and-paste commands for local startup, health checks, API requests,

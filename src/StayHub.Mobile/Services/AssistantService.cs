@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using StayHub.Contracts.Assistant;
 
 namespace StayHub.Mobile.Services;
@@ -41,7 +42,7 @@ public sealed class AssistantService(HttpClient httpClient, IAuthService authSer
                 throw new UnauthorizedAccessException();
 
             if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
-                throw new ApiException("The local AI model is unavailable. Start Ollama and try again.");
+                throw new ApiException(await ReadUnavailableMessageAsync(response, cancellationToken));
 
             if (!response.IsSuccessStatusCode)
             {
@@ -55,5 +56,32 @@ public sealed class AssistantService(HttpClient httpClient, IAuthService authSer
                        cancellationToken: cancellationToken)
                    ?? throw new ApiException("StayHub Assistant returned an empty response.");
         }
+    }
+
+    private static async Task<string> ReadUnavailableMessageAsync(
+        HttpResponseMessage response,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ApiProblemDetails>(
+                cancellationToken: cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(problem?.Detail))
+                return problem.Detail;
+        }
+        catch (JsonException)
+        {
+        }
+        catch (NotSupportedException)
+        {
+        }
+
+        return "StayHub Assistant is temporarily unavailable.";
+    }
+
+    private sealed class ApiProblemDetails
+    {
+        public string? Detail { get; init; }
     }
 }
