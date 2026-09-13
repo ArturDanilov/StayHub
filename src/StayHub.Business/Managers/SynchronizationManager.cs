@@ -13,7 +13,8 @@ public sealed class SynchronizationManager(
     ISourceRepository sourceRepository,
     IPropertyRepository propertyRepository,
     IGuestRepository guestRepository,
-    IReservationRepository reservationRepository)
+    IReservationRepository reservationRepository,
+    ISynchronizationExecutionGate executionGate)
     : ISynchronizationManager
 {
     public async Task<OperationResult<SynchronizationRunResponse, SynchronizationError>> SynchronizeAsync(
@@ -27,6 +28,10 @@ public sealed class SynchronizationManager(
             return Failure(SynchronizationError.SourceDisabled);
         if (string.IsNullOrWhiteSpace(source.Url))
             return Failure(SynchronizationError.SourceUrlMissing);
+
+        using var executionLease = executionGate.TryAcquire(source.Id);
+        if (executionLease is null)
+            return Failure(SynchronizationError.AlreadyRunning);
 
         var run = await runRepository.AddAsync(
             new SynchronizationRun
@@ -62,6 +67,11 @@ public sealed class SynchronizationManager(
                 ? SynchronizationStatus.Completed
                 : SynchronizationStatus.CompletedWithErrors;
             run.ErrorMessage = JoinErrors(errors);
+        }
+        catch (OperationCanceledException exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            run.Status = SynchronizationStatus.Failed;
+            run.ErrorMessage = Truncate(exception.Message);
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {

@@ -184,6 +184,23 @@ public sealed class SynchronizationManagerTests
     }
 
     [Fact]
+    public async Task SynchronizeAsync_WhenSourceIsAlreadyRunning_ReturnsAlreadyRunning()
+    {
+        var context = new TestContext();
+        using var existingExecution = context.ExecutionGate.TryAcquire(context.Source.Id);
+
+        var result = await context.Manager.SynchronizeAsync(
+            context.Source.Id,
+            Xunit.TestContext.Current.CancellationToken);
+
+        Assert.NotNull(existingExecution);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(SynchronizationError.AlreadyRunning, result.Error);
+        Assert.Empty(context.RunRepository.Runs);
+        Assert.Equal(0, context.ExternalClient.RequestCount);
+    }
+
+    [Fact]
     public async Task SynchronizeAsync_ExternalPmsFailure_MarksRunAsFailed()
     {
         var context = new TestContext();
@@ -197,6 +214,23 @@ public sealed class SynchronizationManagerTests
         Assert.NotNull(result.Value);
         Assert.Equal("Failed", result.Value.Status);
         Assert.Equal("Mock PMS is unavailable.", result.Value.ErrorMessage);
+        Assert.NotNull(result.Value.CompletedAtUtc);
+    }
+
+    [Fact]
+    public async Task SynchronizeAsync_ExternalPmsTimeout_MarksRunAsFailed()
+    {
+        var context = new TestContext();
+        context.ExternalClient.Exception = new TaskCanceledException("The external PMS request timed out.");
+
+        var result = await context.Manager.SynchronizeAsync(
+            context.Source.Id,
+            CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Equal("Failed", result.Value.Status);
+        Assert.Equal("The external PMS request timed out.", result.Value.ErrorMessage);
         Assert.NotNull(result.Value.CompletedAtUtc);
     }
 
@@ -251,7 +285,8 @@ public sealed class SynchronizationManagerTests
                 SourceRepository,
                 PropertyRepository,
                 GuestRepository,
-                ReservationRepository);
+                ReservationRepository,
+                ExecutionGate);
         }
 
         public Source Source { get; }
@@ -262,6 +297,7 @@ public sealed class SynchronizationManagerTests
         public FakePropertyRepository PropertyRepository { get; } = new();
         public FakeGuestRepository GuestRepository { get; } = new();
         public FakeReservationRepository ReservationRepository { get; } = new();
+        public SynchronizationExecutionGate ExecutionGate { get; } = new();
         public SynchronizationManager Manager { get; }
 
         public void AddExistingReservation(
@@ -299,11 +335,14 @@ public sealed class SynchronizationManagerTests
     {
         public IReadOnlyList<ExternalReservationResponse> Reservations { get; set; } = [];
         public Exception? Exception { get; set; }
+        public int RequestCount { get; private set; }
 
         public Task<IReadOnlyList<ExternalReservationResponse>> GetReservationsAsync(
             string sourceUrl,
             CancellationToken cancellationToken = default)
         {
+            RequestCount++;
+
             if (Exception is not null)
                 throw Exception;
 

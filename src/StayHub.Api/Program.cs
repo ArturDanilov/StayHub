@@ -6,6 +6,7 @@ using StayHub.Dal.Data;
 using StayHub.Dal.Repositories;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using StayHub.Api.Authentication;
@@ -13,6 +14,9 @@ using StayHub.Api.Common;
 using StayHub.Api.Health;
 using StayHub.Api.Seed;
 using StayHub.Api.Integration;
+using StayHub.Api.Synchronization;
+using StayHub.Api.Assistant;
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,8 +29,13 @@ if (string.IsNullOrWhiteSpace(connectionString))
 }
 
 builder.Services.AddControllers();
+var assistantConfiguration = builder.Configuration
+    .GetSection(AiAssistantOptions.SectionName)
+    .Get<AiAssistantOptions>() ?? new AiAssistantOptions();
 builder.Services.AddRateLimiter(options =>
 {
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
     options.AddPolicy("login", httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
             httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
@@ -36,6 +45,23 @@ builder.Services.AddRateLimiter(options =>
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0
             }));
+
+    options.AddPolicy("assistant", httpContext =>
+    {
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var partitionKey = !string.IsNullOrWhiteSpace(userId)
+            ? $"user:{userId}"
+            : $"ip:{httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = assistantConfiguration.DailyRequestLimit,
+                Window = TimeSpan.FromDays(1),
+                QueueLimit = 0
+            });
+    });
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks()
@@ -72,6 +98,46 @@ builder.Services.AddScoped<IPropertyManager, PropertyManager>();
 
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationManager, ReservationManager>();
+builder.Services.AddScoped<IAssistantManager, AssistantManager>();
+builder.Services
+    .AddOptions<AiAssistantOptions>()
+    .Bind(builder.Configuration.GetSection(AiAssistantOptions.SectionName))
+    .Validate(options => AiAssistantProviders.IsSupported(options.Provider),
+        "AiAssistant Provider must be Ollama or AzureFoundry.")
+    .Validate(options => !options.Enabled || Uri.TryCreate(options.BaseAddress, UriKind.Absolute, out _),
+        "AiAssistant BaseAddress must be an absolute URL.")
+    .Validate(options => !options.Enabled || !string.IsNullOrWhiteSpace(options.Model),
+        "AiAssistant Model is required.")
+    .Validate(options => !options.Enabled
+                         || !options.Provider.Equals(AiAssistantProviders.AzureFoundry, StringComparison.OrdinalIgnoreCase)
+                         || !string.IsNullOrWhiteSpace(options.ApiKey),
+        "AiAssistant ApiKey is required for AzureFoundry.")
+    .Validate(options => options.TimeoutSeconds > 0, "AiAssistant TimeoutSeconds must be positive.")
+    .Validate(options => options.MaxOutputTokens is > 0 and <= 2000,
+        "AiAssistant MaxOutputTokens must be between 1 and 2000.")
+    .Validate(options => options.DailyRequestLimit is > 0 and <= 1000,
+        "AiAssistant DailyRequestLimit must be between 1 and 1000.")
+    .ValidateOnStart();
+builder.Services.AddHttpClient<OllamaAssistantClient>((services, client) =>
+{
+    var options = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<AiAssistantOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseAddress.TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+});
+builder.Services.AddHttpClient<AzureFoundryAssistantClient>((services, client) =>
+{
+    var options = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<AiAssistantOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseAddress.TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+    client.DefaultRequestHeaders.Add("api-key", options.ApiKey);
+});
+builder.Services.AddScoped<IAssistantClient>(services =>
+{
+    var options = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<AiAssistantOptions>>().Value;
+    return options.Provider.Equals(AiAssistantProviders.AzureFoundry, StringComparison.OrdinalIgnoreCase)
+        ? services.GetRequiredService<AzureFoundryAssistantClient>()
+        : services.GetRequiredService<OllamaAssistantClient>();
+});
 
 builder.Services.AddScoped<ISourceRepository, SourceRepository>();
 builder.Services.AddScoped<ISourceManager, SourceManager>();
@@ -85,10 +151,20 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 builder.Services.AddScoped<IUserManager, UserManager>();
 builder.Services.AddScoped<ISynchronizationRunRepository, SynchronizationRunRepository>();
+builder.Services.AddSingleton<ISynchronizationExecutionGate, SynchronizationExecutionGate>();
 builder.Services.AddScoped<ISynchronizationManager, SynchronizationManager>();
+builder.Services.AddScoped<AutomaticSynchronizationJob>();
+builder.Services
+    .AddOptions<AutomaticSynchronizationOptions>()
+    .Bind(builder.Configuration.GetSection(AutomaticSynchronizationOptions.SectionName))
+    .Validate(options => options.IntervalMinutes > 0, "IntervalMinutes must be greater than zero.")
+    .Validate(options => options.InitialDelaySeconds >= 0, "InitialDelaySeconds cannot be negative.")
+    .ValidateOnStart();
+builder.Services.AddHostedService<ReservationSynchronizationWorker>();
 builder.Services.AddHttpClient<IExternalReservationClient, ExternalReservationClient>(client =>
 {
-    client.Timeout = TimeSpan.FromSeconds(15);
+    // A scale-to-zero PMS container can need more than 15 seconds for its first cold start.
+    client.Timeout = TimeSpan.FromSeconds(60);
 });
 
 var jwtOptions = builder.Configuration
@@ -156,8 +232,8 @@ if (builder.Configuration.GetValue("DatabaseInitialization:ApplyMigrations", tru
     await DatabaseSeeder.SeedAsync(app.Services);
 }
 
-app.UseRateLimiter();
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 
 if (app.Environment.IsDevelopment()

@@ -5,11 +5,9 @@ using StayHub.Mapping.Guests;
 
 namespace StayHub.Business.Managers;
 
-public sealed class GuestManager(IGuestRepository repository)
-    : IGuestManager
+public sealed class GuestManager(IGuestRepository repository) : IGuestManager
 {
-    public async Task<IReadOnlyList<GuestResponse>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<GuestResponse>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var guests = await repository.GetAllAsync(cancellationToken);
 

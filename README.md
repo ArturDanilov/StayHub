@@ -15,6 +15,7 @@ a physical iPhone and stores its data in Azure.
 - Reservation validation and Admin-only deletion
 - Idempotent reservation synchronization from a deterministic Mock PMS
 - Synchronization history with conflict and failure reporting
+- Read-only AI assistant that answers reservation questions in Russian or German
 - Deterministic demonstration data
 - Liveness and database-readiness health checks
 - Native .NET MAUI client for iOS
@@ -102,6 +103,35 @@ Stop the local database with:
 docker compose down
 ```
 
+### Local AI assistant
+
+The development AI provider is [Ollama](https://ollama.com/), so local chat does
+not consume Azure resources or require a paid API key. Install Ollama and
+download the multilingual model once:
+
+```bash
+brew install ollama
+ollama pull qwen3:4b
+```
+
+Start Ollama in a separate terminal before running the StayHub API:
+
+```bash
+ollama serve
+```
+
+Open **Assistant** in the MAUI app and ask a question in Russian or German. The
+API gives the model a read-only snapshot of up to 100 reservations and asks it
+to answer in the language of the latest question. Guest email addresses and
+phone numbers are not sent to the model. The model never connects directly to
+SQL Server and cannot modify StayHub data.
+
+The assistant is enabled in Development and disabled in Production by default.
+Production can use Azure AI Foundry after its endpoint, deployment name, and
+secret API key are configured. StayHub limits response length and the daily
+number of assistant requests. See
+[Azure deployment](docs/AZURE_DEPLOYMENT.md#azure-ai-foundry-assistant).
+
 ## Azure deployment
 
 The portfolio environment uses this flow:
@@ -126,8 +156,29 @@ The first request can take a few seconds while the application scales from
 zero. Swagger can be enabled temporarily through the Container App
 configuration when an API demonstration is required.
 
+### Wake up Azure services
+
+Open these links on a phone and wait for a response before signing in:
+
+- [API readiness (API and database)](https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/ready)
+- [API liveness](https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/live)
+- [Mock PMS liveness](https://stayhub-mockpms.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/live)
+- [Mock PMS reservations](https://stayhub-mockpms.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/api/reservations)
+
+The same checks from a terminal:
+
+```bash
+curl -i "https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/ready"
+curl -i "https://stayhub-api.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/live"
+curl -i "https://stayhub-mockpms.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/health/live"
+curl -sS "https://stayhub-mockpms.icyforest-8c1312c9.germanywestcentral.azurecontainerapps.io/api/reservations"
+```
+
 Deployment configuration, required environment variables, and operational
 notes are documented in [Azure deployment](docs/AZURE_DEPLOYMENT.md).
+Copy-and-paste commands for local startup, health checks, API requests,
+synchronization, and Azure operations are in the [operations
+runbook](docs/RUNBOOK.md).
 
 ## Security
 
@@ -141,6 +192,7 @@ user-secrets locally and Azure Container App secrets in the cloud.
 - [Architecture](docs/ARCHITECTURE.md)
 - [Authentication](docs/authentication.md)
 - [Domain model](docs/domain.md)
+- [Operations runbook](docs/RUNBOOK.md)
 - [Azure deployment](docs/AZURE_DEPLOYMENT.md)
 - [Reservation synchronization](docs/SYNCHRONIZATION.md)
 - [Roadmap](docs/roadmap.md)
