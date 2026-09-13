@@ -14,6 +14,7 @@ using StayHub.Api.Health;
 using StayHub.Api.Seed;
 using StayHub.Api.Integration;
 using StayHub.Api.Synchronization;
+using StayHub.Api.Assistant;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,6 +74,21 @@ builder.Services.AddScoped<IPropertyManager, PropertyManager>();
 
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationManager, ReservationManager>();
+builder.Services.AddScoped<IAssistantManager, AssistantManager>();
+builder.Services
+    .AddOptions<AiAssistantOptions>()
+    .Bind(builder.Configuration.GetSection(AiAssistantOptions.SectionName))
+    .Validate(options => Uri.TryCreate(options.BaseAddress, UriKind.Absolute, out _),
+        "AiAssistant BaseAddress must be an absolute URL.")
+    .Validate(options => !string.IsNullOrWhiteSpace(options.Model), "AiAssistant Model is required.")
+    .Validate(options => options.TimeoutSeconds > 0, "AiAssistant TimeoutSeconds must be positive.")
+    .ValidateOnStart();
+builder.Services.AddHttpClient<IAssistantClient, OllamaAssistantClient>((services, client) =>
+{
+    var options = services.GetRequiredService<Microsoft.Extensions.Options.IOptions<AiAssistantOptions>>().Value;
+    client.BaseAddress = new Uri(options.BaseAddress.TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+});
 
 builder.Services.AddScoped<ISourceRepository, SourceRepository>();
 builder.Services.AddScoped<ISourceManager, SourceManager>();

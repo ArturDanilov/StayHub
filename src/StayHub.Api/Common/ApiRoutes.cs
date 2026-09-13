@@ -4,6 +4,12 @@ public class ApiRoutes
 {
     private const string Api = "api";
 
+    public static class Assistant
+    {
+        public const string Base = $"{Api}/assistant";
+        public const string Chat = "chat";
+    }
+
     public static class Authentication
     {
         public const string Base = $"{Api}/auth";

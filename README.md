@@ -15,6 +15,7 @@ a physical iPhone and stores its data in Azure.
 - Reservation validation and Admin-only deletion
 - Idempotent reservation synchronization from a deterministic Mock PMS
 - Synchronization history with conflict and failure reporting
+- Read-only AI assistant that answers reservation questions in Russian or German
 - Deterministic demonstration data
 - Liveness and database-readiness health checks
 - Native .NET MAUI client for iOS
@@ -101,6 +102,32 @@ Stop the local database with:
 ```bash
 docker compose down
 ```
+
+### Local AI assistant
+
+The development AI provider is [Ollama](https://ollama.com/), so local chat does
+not consume Azure resources or require a paid API key. Install Ollama and
+download the multilingual model once:
+
+```bash
+brew install ollama
+ollama pull qwen3:4b
+```
+
+Start Ollama in a separate terminal before running the StayHub API:
+
+```bash
+ollama serve
+```
+
+Open **Assistant** in the MAUI app and ask a question in Russian or German. The
+API gives the model a read-only snapshot of up to 100 reservations and asks it
+to answer in the language of the latest question. Guest email addresses and
+phone numbers are not sent to the model. The model never connects directly to
+SQL Server and cannot modify StayHub data.
+
+The assistant is enabled in Development and disabled in Production by default.
+This keeps the Azure MVP unchanged until a production AI provider is chosen.
 
 ## Azure deployment
 

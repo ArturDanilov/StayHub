@@ -35,6 +35,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<IReservationFormService, ReservationFormService>();
         builder.Services.AddSingleton<IUsersService, UsersService>();
         builder.Services.AddSingleton<ISynchronizationService, SynchronizationService>();
+        builder.Services.AddSingleton<IAssistantService>(services =>
+            new AssistantService(
+                new HttpClient
+                {
+                    BaseAddress = new Uri(apiSettings.BaseAddress),
+                    Timeout = TimeSpan.FromMinutes(2)
+                },
+                services.GetRequiredService<IAuthService>()));
         builder.Services.AddSingleton<IAppNavigator, AppNavigator>();
 
         builder.Services.AddTransient<LoginPage>();
