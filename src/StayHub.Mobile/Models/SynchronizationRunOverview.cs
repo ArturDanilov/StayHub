@@ -78,8 +78,8 @@ public sealed class SynchronizationRunOverview : INotifyPropertyChanged
     public bool HasErrors => Errors.Count > 0;
 
     public string ConflictDescription => ConflictCount == 1
-        ? "1 imported reservation overlaps another reservation for the same property."
-        : $"{ConflictCount} imported reservations overlap other reservations for the same property.";
+        ? "1 imported booking overlaps another booking for the same property."
+        : $"{ConflictCount} imported bookings overlap other bookings for the same property.";
 
     public string StatusColor => Status switch
     {

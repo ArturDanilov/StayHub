@@ -21,7 +21,7 @@ public sealed class ReservationsService(
         try
         {
             using var response = await httpClient.SendAsync(request, cancellationToken);
-            await EnsureSuccessAsync(response, "Could not load reservations.");
+            await EnsureSuccessAsync(response, "Could not load bookings.");
 
             var reservations = await response.Content.ReadFromJsonAsync<PagedResponse<ReservationResponse>>(
                                    cancellationToken: cancellationToken)
@@ -84,7 +84,7 @@ public sealed class ReservationsService(
         try
         {
             using var response = await httpClient.SendAsync(request, cancellationToken);
-            await EnsureSuccessAsync(response, "Could not update the reservation status.");
+            await EnsureSuccessAsync(response, "Could not update the booking status.");
         }
         catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
         {
@@ -102,7 +102,7 @@ public sealed class ReservationsService(
         try
         {
             using var response = await httpClient.SendAsync(request, cancellationToken);
-            await EnsureSuccessAsync(response, "Could not create the reservation.");
+            await EnsureSuccessAsync(response, "Could not create the booking.");
         }
         catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
         {
@@ -121,7 +121,7 @@ public sealed class ReservationsService(
         try
         {
             using var response = await httpClient.SendAsync(request, cancellationToken);
-            await EnsureSuccessAsync(response, "Could not update the reservation.");
+            await EnsureSuccessAsync(response, "Could not update the booking.");
         }
         catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
         {
@@ -136,7 +136,7 @@ public sealed class ReservationsService(
         try
         {
             using var response = await httpClient.SendAsync(request, cancellationToken);
-            await EnsureSuccessAsync(response, "Could not delete the reservation.");
+            await EnsureSuccessAsync(response, "Could not delete the booking.");
         }
         catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException)
         {

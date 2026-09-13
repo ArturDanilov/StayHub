@@ -192,6 +192,8 @@ user-secrets locally and Azure Container App secrets in the cloud.
 - [Architecture](docs/ARCHITECTURE.md)
 - [Authentication](docs/authentication.md)
 - [Domain model](docs/domain.md)
+- [UI terminology](docs/UI_TERMINOLOGY.md)
+- [Operations dashboard](docs/OPERATIONS_DASHBOARD.md)
 - [Operations runbook](docs/RUNBOOK.md)
 - [Azure deployment](docs/AZURE_DEPLOYMENT.md)
 - [Reservation synchronization](docs/SYNCHRONIZATION.md)

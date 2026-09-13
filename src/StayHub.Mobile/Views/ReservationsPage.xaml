@@ -21,7 +21,7 @@
             <Border BackgroundColor="{StaticResource Secondary}" Stroke="{StaticResource Primary}" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="12,0">
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
                     <Label Text="⌕" FontSize="25" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
-                    <Entry x:Name="SearchEntry" Grid.Column="1" Placeholder="Search reservations" BackgroundColor="Transparent"
+                    <Entry x:Name="SearchEntry" Grid.Column="1" Placeholder="Search bookings" BackgroundColor="Transparent"
                            IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" TextChanged="OnSearchTextChanged" />
                 </Grid>
             </Border>
@@ -65,7 +65,7 @@
                 <Label x:Name="ErrorLabel" HorizontalTextAlignment="Center" Style="{StaticResource Caption}" />
                 <Button Text="Try again" Clicked="OnRetryClicked" />
             </VerticalStackLayout>
-            <Label x:Name="EmptyLabel" IsVisible="False" Text="No matching reservations." Style="{StaticResource Caption}" HorizontalOptions="Center" VerticalOptions="Center" />
+            <Label x:Name="EmptyLabel" IsVisible="False" Text="No matching bookings." Style="{StaticResource Caption}" HorizontalOptions="Center" VerticalOptions="Center" />
         </Grid>
 
         <Grid

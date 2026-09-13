@@ -49,8 +49,8 @@ public partial class ReservationDetailPage : ContentPage
     private async void OnDeleteClicked(object? sender, EventArgs e)
     {
         var confirmed = await DisplayAlertAsync(
-            "Delete reservation?",
-            $"Reservation {_reservation.ExternalId} will be permanently deleted.",
+            "Delete booking?",
+            $"Booking {_reservation.ExternalId} will be permanently deleted.",
             "Delete",
             "Cancel");
         if (!confirmed)
@@ -112,7 +112,7 @@ public partial class ReservationDetailPage : ContentPage
         }
         else if (transitions.Count == 0)
         {
-            PermissionLabel.Text = "This reservation is in a final status.";
+            PermissionLabel.Text = "This booking is in a final status.";
             PermissionLabel.IsVisible = true;
         }
     }

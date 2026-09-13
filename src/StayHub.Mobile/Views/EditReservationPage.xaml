@@ -3,10 +3,10 @@
     x:Class="StayHub.Mobile.Views.EditReservationPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Edit reservation">
+    Title="Edit booking">
     <ScrollView>
         <VerticalStackLayout Padding="20,16,20,32" Spacing="14">
-            <Label Text="Edit reservation" Style="{StaticResource PageTitle}" />
+            <Label Text="Edit booking" Style="{StaticResource PageTitle}" />
             <Label x:Name="ReservationCaption" Style="{StaticResource Caption}" />
 
             <Label Text="External ID" />

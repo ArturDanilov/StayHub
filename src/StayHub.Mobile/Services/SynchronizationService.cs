@@ -97,7 +97,7 @@ public sealed class SynchronizationService(HttpClient httpClient, IAuthService a
         if (response.StatusCode == HttpStatusCode.Forbidden)
         {
             response.Dispose();
-            throw new ApiException("Your role does not allow reservation synchronization.");
+            throw new ApiException("Your role does not allow booking synchronization.");
         }
 
         if (response.IsSuccessStatusCode)

@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:StayHub.Mobile.Models"
-    Title="Assistant">
+    Title="AI">
 
     <Grid
         Padding="20,16"
@@ -15,7 +15,7 @@
         <!-- Header -->
         <VerticalStackLayout Spacing="4">
             <Label
-                Text="StayHub Assistant"
+                Text="StayHub AI"
                 Style="{StaticResource PageTitle}" />
 
             <Label
