@@ -103,6 +103,18 @@ Stop the local database with:
 docker compose down
 ```
 
+### Integration tests
+
+Keep Docker Desktop running, then execute:
+
+```bash
+dotnet run --project tests/StayHub.Api.IntegrationTests
+```
+
+The test suite starts one temporary SQL Server container, runs the real StayHub
+API against it, resets the database between tests, and removes the container
+when finished. It does not connect to the Azure API or Azure SQL Database.
+
 ### Local AI assistant
 
 The development AI provider is [Ollama](https://ollama.com/), so local chat does
