@@ -7,6 +7,11 @@
 
     <TabBar>
         <ShellContent
+            x:Name="TodayContent"
+            Title="Today"
+            Route="Today" />
+
+        <ShellContent
             x:Name="PropertiesContent"
             Title="Properties"
             Route="Properties" />
