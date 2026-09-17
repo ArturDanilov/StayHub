@@ -30,19 +30,6 @@
             </Border>
         </DataTemplate>
 
-        <DataTemplate x:Key="AlertTemplate" x:DataType="models:SynchronizationAlertOverview">
-            <Border Style="{StaticResource Card}" Margin="0,0,0,10" Stroke="#B3261E">
-                <VerticalStackLayout Spacing="5">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="{Binding SourceName}" Style="{StaticResource SectionTitle}" />
-                        <Label Grid.Column="1" Text="{Binding Status}" TextColor="#B3261E" FontFamily="OpenSansSemibold" />
-                    </Grid>
-                    <Label Text="{Binding Summary}" Style="{StaticResource Caption}" />
-                    <Label Text="{Binding ErrorMessage}" LineBreakMode="TailTruncation" MaxLines="2" />
-                    <Label Text="{Binding StartedAtUtc, StringFormat='Started {0:dd MMM, HH:mm} UTC'}" Style="{StaticResource Caption}" />
-                </VerticalStackLayout>
-            </Border>
-        </DataTemplate>
     </ContentPage.Resources>
 
     <Grid>
@@ -90,11 +77,35 @@
                                              BindableLayout.ItemTemplate="{StaticResource BookingTemplate}" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="Synchronization alerts" Style="{StaticResource SectionTitle}" />
-                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Dashboard.SynchronizationAlerts}"
-                                             BindableLayout.ItemTemplate="{StaticResource AlertTemplate}" />
-                    </VerticalStackLayout>
+                    <Border
+                        Style="{StaticResource Card}"
+                        Stroke="{Binding SynchronizationStatusColor}"
+                        Padding="16">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnSynchronizationStatusTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                            <Label
+                                Text="!"
+                                TextColor="{Binding SynchronizationStatusColor}"
+                                FontFamily="OpenSansSemibold"
+                                FontSize="20"
+                                HorizontalTextAlignment="Center"
+                                VerticalTextAlignment="Center"
+                                WidthRequest="28" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                <Label Text="{Binding SynchronizationStatusTitle}" FontFamily="OpenSansSemibold" FontSize="16" />
+                                <Label Text="{Binding SynchronizationStatusDetail}" Style="{StaticResource Caption}" LineBreakMode="TailTruncation" MaxLines="1" />
+                            </VerticalStackLayout>
+                            <Label
+                                Grid.Column="2"
+                                Text="›"
+                                FontSize="28"
+                                Style="{StaticResource Caption}"
+                                VerticalOptions="Center"
+                                IsVisible="{Binding HasSynchronizationAlerts}" />
+                        </Grid>
+                    </Border>
                 </VerticalStackLayout>
             </ScrollView>
         </RefreshView>

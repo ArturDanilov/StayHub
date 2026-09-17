@@ -10,6 +10,30 @@ public sealed class StayHubShellRenderer : ShellRenderer
     {
         return new StayHubTabBarAppearanceTracker();
     }
+
+    public override void ViewDidLayoutSubviews()
+    {
+        base.ViewDidLayoutSubviews();
+
+        var tabBarController = FindTabBarController(this);
+        if (tabBarController is not null)
+            StayHubTabBarAppearanceTracker.ConfigureItems(tabBarController.TabBar);
+    }
+
+    private static UITabBarController? FindTabBarController(UIViewController controller)
+    {
+        if (controller is UITabBarController tabBarController)
+            return tabBarController;
+
+        foreach (var child in controller.ChildViewControllers)
+        {
+            var nestedTabBarController = FindTabBarController(child);
+            if (nestedTabBarController is not null)
+                return nestedTabBarController;
+        }
+
+        return null;
+    }
 }
 
 public sealed class StayHubTabBarAppearanceTracker : ShellTabBarAppearanceTracker
@@ -34,6 +58,11 @@ public sealed class StayHubTabBarAppearanceTracker : ShellTabBarAppearanceTracke
         tabBar.StandardAppearance = tabAppearance;
         tabBar.ScrollEdgeAppearance = tabAppearance;
 
+        ConfigureItems(tabBar);
+    }
+
+    internal static void ConfigureItems(UITabBar tabBar)
+    {
         if (tabBar.Items is null)
             return;
 
