@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  backend:
+    name: Backend build and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: |
+          dotnet restore src/StayHub.Api/StayHub.Api.csproj
+          dotnet restore src/StayHub.MockPms/StayHub.MockPms.csproj
+          dotnet restore tests/StayHub.Business.Tests/StayHub.Business.Tests.csproj
+          dotnet restore tests/StayHub.Api.IntegrationTests/StayHub.Api.IntegrationTests.csproj
+
+      - name: Build backend
+        run: |
+          dotnet build src/StayHub.Api/StayHub.Api.csproj --configuration Release --no-restore
+          dotnet build src/StayHub.MockPms/StayHub.MockPms.csproj --configuration Release --no-restore
+          dotnet build tests/StayHub.Business.Tests/StayHub.Business.Tests.csproj --configuration Release --no-restore
+          dotnet build tests/StayHub.Api.IntegrationTests/StayHub.Api.IntegrationTests.csproj --configuration Release --no-restore
+
+      - name: Run unit tests
+        run: >-
+          dotnet run
+          --project tests/StayHub.Business.Tests/StayHub.Business.Tests.csproj
+          --configuration Release
+          --no-build
+          --no-restore
+
+      - name: Verify Docker
+        run: docker info
+
+      - name: Run integration tests
+        run: >-
+          dotnet run
+          --project tests/StayHub.Api.IntegrationTests/StayHub.Api.IntegrationTests.csproj
+          --configuration Release
+          --no-build
+          --no-restore

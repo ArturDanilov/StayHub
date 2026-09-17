@@ -115,6 +115,17 @@ The test suite starts one temporary SQL Server container, runs the real StayHub
 API against it, resets the database between tests, and removes the container
 when finished. It does not connect to the Azure API or Azure SQL Database.
 
+### Continuous integration
+
+GitHub Actions runs the backend build, unit tests, and Docker-based integration
+tests for pull requests targeting `develop`. Repeated pushes cancel an older run
+for the same pull request. The workflow uses GitHub-hosted runner and Docker
+resources only; it does not connect to or deploy anything in Azure.
+
+The MAUI iOS project is intentionally excluded because the backend workflow
+runs on Linux and does not have Xcode or the iOS workload. Mobile builds remain
+a separate local validation step for now.
+
 ### Local AI assistant
 
 The development AI provider is [Ollama](https://ollama.com/), so local chat does
