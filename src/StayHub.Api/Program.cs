@@ -98,6 +98,9 @@ builder.Services.AddScoped<IPropertyManager, PropertyManager>();
 
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationManager, ReservationManager>();
+builder.Services.AddScoped<IOperationsDashboardRepository, OperationsDashboardRepository>();
+builder.Services.AddScoped<IOperationsDashboardManager, OperationsDashboardManager>();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<IAssistantManager, AssistantManager>();
 builder.Services
     .AddOptions<AiAssistantOptions>()
