@@ -64,7 +64,9 @@ A synchronization alert contains the run and source identity, status, start
 time, conflict and failure counts, and an optional error message. The contract
 does not expose synchronization implementation details.
 
-The endpoint route and data-access implementation belong to SH-3.
+The dashboard is available through `GET /api/operations-dashboard`. Its EF Core
+queries are read-only, filter and project on the database side, and return only
+the limited preview records defined above.
 
 ## Access and API boundary
 

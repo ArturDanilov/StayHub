@@ -15,6 +15,11 @@ public class ApiRoutes
         public const string Base = $"{Api}/auth";
         public const string Login = "login";
     }
+
+    public static class OperationsDashboard
+    {
+        public const string Base = $"{Api}/operations-dashboard";
+    }
     
     public static class Sources
     {
