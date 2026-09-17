@@ -3,12 +3,12 @@
     x:Class="StayHub.Mobile.Views.CreateReservationPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="New reservation">
+    Title="New booking">
 
     <ScrollView>
         <VerticalStackLayout Padding="20,16,20,32" Spacing="14">
-            <Label Text="New reservation" Style="{StaticResource PageTitle}" />
-            <Label Text="Create a reservation in StayHub" Style="{StaticResource Caption}" />
+            <Label Text="New booking" Style="{StaticResource PageTitle}" />
+            <Label Text="Create a booking in StayHub" Style="{StaticResource Caption}" />
 
             <Label Text="External ID" />
             <Entry x:Name="ExternalIdEntry" Placeholder="For example, MANUAL-1001" MaxLength="100"
@@ -40,7 +40,7 @@
             <Label x:Name="ErrorLabel" IsVisible="False" TextColor="#C62828" />
             <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False" IsRunning="False"
                                Color="{StaticResource Primary}" />
-            <Button x:Name="SaveButton" Text="Create reservation" Clicked="OnSaveClicked" />
+            <Button x:Name="SaveButton" Text="Create booking" Clicked="OnSaveClicked" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

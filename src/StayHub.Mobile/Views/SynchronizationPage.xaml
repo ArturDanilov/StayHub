@@ -27,8 +27,8 @@
 
     <Grid Padding="20,16" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="14">
         <VerticalStackLayout Spacing="4">
-            <Label Text="Reservation sync" Style="{StaticResource PageTitle}" />
-            <Label Text="Import reservations from an external PMS" Style="{StaticResource Caption}" />
+            <Label Text="Booking synchronization" Style="{StaticResource PageTitle}" />
+            <Label Text="Import bookings from an external PMS" Style="{StaticResource Caption}" />
         </VerticalStackLayout>
 
         <Border Grid.Row="1" Style="{StaticResource Card}">
@@ -100,7 +100,7 @@
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
-                <Button Text="View reservations" Clicked="OnViewReservationsClicked" />
+                <Button Text="View bookings" Clicked="OnViewReservationsClicked" />
             </VerticalStackLayout>
         </Border>
 
@@ -149,7 +149,7 @@
                                                 </DataTemplate>
                                             </BindableLayout.ItemTemplate>
                                         </VerticalStackLayout>
-                                        <Button Text="View reservations" Clicked="OnViewReservationsClicked" />
+                                        <Button Text="View bookings" Clicked="OnViewReservationsClicked" />
                                     </VerticalStackLayout>
                                 </VerticalStackLayout>
                             </Border>

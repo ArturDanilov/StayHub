@@ -30,7 +30,7 @@ public partial class EditReservationPage : ContentPage
         _onUpdated = onUpdated;
         InitializeComponent();
 
-        ReservationCaption.Text = $"Reservation #{reservation.Id}";
+        ReservationCaption.Text = $"Booking #{reservation.Id}";
         ExternalIdEntry.Text = reservation.ExternalId;
         ArrivalDatePicker.Date = reservation.ArrivalDate.ToDateTime(TimeOnly.MinValue);
         DepartureDatePicker.Date = reservation.DepartureDate.ToDateTime(TimeOnly.MinValue);
