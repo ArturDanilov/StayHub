@@ -5,8 +5,6 @@ namespace StayHub.Mobile;
 
 public partial class AppShell
 {
-    private readonly AssistantPage _assistantPage;
-
     public AppShell(
         TodayPage todayPage,
         PropertiesPage propertiesPage,
@@ -14,38 +12,35 @@ public partial class AppShell
         AssistantPage assistantPage,
         AccountPage accountPage)
     {
-        _assistantPage = assistantPage;
         InitializeComponent();
         TodayContent.Content = todayPage;
         PropertiesContent.Content = propertiesPage;
+        AssistantContent.Content = assistantPage;
         ReservationsContent.Content = reservationsPage;
         AccountContent.Content = accountPage;
 
-        AddAssistantToolbarItem(todayPage);
-        AddAssistantToolbarItem(propertiesPage);
-        AddAssistantToolbarItem(reservationsPage);
-        AddAssistantToolbarItem(accountPage);
+        AddStaffChatToolbarItem(todayPage);
+        AddStaffChatToolbarItem(propertiesPage);
+        AddStaffChatToolbarItem(reservationsPage);
+        AddStaffChatToolbarItem(accountPage);
     }
 
-    private void AddAssistantToolbarItem(ContentPage page)
+    private static void AddStaffChatToolbarItem(ContentPage page)
     {
-        var assistantItem = new ToolbarItem
+        var staffChatItem = new ToolbarItem
         {
             Text = "💬",
             Order = ToolbarItemOrder.Primary,
             Priority = 0
         };
 
-        SemanticProperties.SetDescription(assistantItem, "Open AI chat");
-        assistantItem.Clicked += OnAssistantClicked;
-        page.ToolbarItems.Add(assistantItem);
-    }
+        SemanticProperties.SetDescription(staffChatItem, "Open staff chat");
+        staffChatItem.Clicked += async (_, _) =>
+            await page.DisplayAlertAsync(
+                "Staff chat",
+                "Team messaging will be available here soon.",
+                "OK");
 
-    private async void OnAssistantClicked(object? sender, EventArgs e)
-    {
-        if (Navigation.NavigationStack.LastOrDefault() == _assistantPage)
-            return;
-
-        await Navigation.PushAsync(_assistantPage);
+        page.ToolbarItems.Add(staffChatItem);
     }
 }

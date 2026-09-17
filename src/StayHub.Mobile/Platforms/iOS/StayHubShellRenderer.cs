@@ -69,11 +69,14 @@ public sealed class StayHubTabBarAppearanceTracker : ShellTabBarAppearanceTracke
         foreach (var item in tabBar.Items)
         {
             var title = item.Title ?? item.AccessibilityLabel;
+            var isAssistant = title == "AI";
             item.AccessibilityLabel = title;
             item.Image = GetTabIcon(title);
             item.SelectedImage = GetTabIcon(title);
             item.Title = null;
-            item.ImageInsets = new UIEdgeInsets(6, 0, -6, 0);
+            item.ImageInsets = isAssistant
+                ? new UIEdgeInsets(2, 0, -2, 0)
+                : new UIEdgeInsets(6, 0, -6, 0);
         }
     }
 
@@ -83,6 +86,7 @@ public sealed class StayHubTabBarAppearanceTracker : ShellTabBarAppearanceTracke
         {
             "Today" => "calendar",
             "Properties" => "building.2",
+            "AI" => "sparkles",
             "Bookings" => "book.closed",
             "Sync" => "arrow.triangle.2.circlepath",
             "Users" => "person.2",
