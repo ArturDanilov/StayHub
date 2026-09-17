@@ -9,6 +9,7 @@ public partial class AppShell : Shell
     private readonly IAuthService _authService;
 
     public AppShell(
+        TodayPage todayPage,
         PropertiesPage propertiesPage,
         ReservationsPage reservationsPage,
         AssistantPage assistantPage,
@@ -18,6 +19,7 @@ public partial class AppShell : Shell
     {
         _authService = authService;
         InitializeComponent();
+        TodayContent.Content = todayPage;
         PropertiesContent.Content = propertiesPage;
         ReservationsContent.Content = reservationsPage;
         AssistantContent.Content = assistantPage;

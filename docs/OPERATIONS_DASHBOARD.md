@@ -74,3 +74,11 @@ Admin, Receptionist, and Viewer roles can read the dashboard through the
 existing read-access policy. The dashboard will use a dedicated read-oriented
 endpoint rather than requiring the mobile client to compose several generic
 API calls.
+
+## Mobile experience
+
+Today is the first tab in the MAUI application. It shows the four booking
+previews and synchronization alerts returned by the dashboard endpoint,
+supports pull-to-refresh, and opens the existing booking detail screen when a
+preview is selected. The complete Bookings tab remains available for search,
+filtering, and pagination.

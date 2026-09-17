@@ -12,6 +12,32 @@ public sealed class ReservationsService(
     HttpClient httpClient,
     IAuthService authService) : IReservationsService
 {
+    public async Task<ReservationOverview?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        using var request = await CreateAuthorizedRequestAsync(HttpMethod.Get, $"api/reservations/{id}");
+
+        try
+        {
+            using var response = await httpClient.SendAsync(request, cancellationToken);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                return null;
+
+            await EnsureSuccessAsync(response, "Could not load the booking.");
+            var reservation = await response.Content.ReadFromJsonAsync<ReservationResponse>(
+                cancellationToken: cancellationToken);
+
+            return reservation is null ? null : Map(reservation);
+        }
+        catch (Exception exception) when (
+            exception is HttpRequestException
+            || exception is TaskCanceledException && !cancellationToken.IsCancellationRequested)
+        {
+            throw CreateConnectionException(exception, cancellationToken);
+        }
+    }
+
     public async Task<PagedReservationOverview> GetAllAsync(
         ReservationSearchCriteria criteria,
         CancellationToken cancellationToken = default)

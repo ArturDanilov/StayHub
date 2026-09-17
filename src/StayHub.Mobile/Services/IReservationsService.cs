@@ -5,6 +5,9 @@ namespace StayHub.Mobile.Services;
 
 public interface IReservationsService
 {
+    Task<ReservationOverview?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default);
     Task<PagedReservationOverview> GetAllAsync(
         ReservationSearchCriteria criteria,
         CancellationToken cancellationToken = default);
