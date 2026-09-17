@@ -46,10 +46,29 @@ Synchronization alerts show the five most recently started matching runs,
 ordered by `StartedAtUtc` descending and then by run ID descending. An alert may
 match more than one rule but appears only once.
 
+## API contract
+
+The dedicated dashboard response contains:
+
+- `BusinessDate` calculated by the backend;
+- `Arrivals`, `Departures`, `InHouse`, and `UpcomingArrivals` sections;
+- `SynchronizationAlerts` containing at most five recent alerts.
+
+Each booking section has `TotalCount` for the complete matching result and
+`Items` containing at most five preview records. A booking preview contains the
+booking ID used for navigation, dates, status, property identity and name, and
+guest identity and name. It intentionally does not duplicate the complete
+reservation response.
+
+A synchronization alert contains the run and source identity, status, start
+time, conflict and failure counts, and an optional error message. The contract
+does not expose synchronization implementation details.
+
+The endpoint route and data-access implementation belong to SH-3.
+
 ## Access and API boundary
 
 Admin, Receptionist, and Viewer roles can read the dashboard through the
 existing read-access policy. The dashboard will use a dedicated read-oriented
 endpoint rather than requiring the mobile client to compose several generic
-API calls. Contract and implementation details belong to SH-2 and later work
-items and are intentionally not defined here.
+API calls.
