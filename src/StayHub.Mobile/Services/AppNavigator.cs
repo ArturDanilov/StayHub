@@ -1,4 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
 using StayHub.Mobile.Views;
 
 namespace StayHub.Mobile.Services;

@@ -6,10 +6,6 @@
     xmlns:models="clr-namespace:StayHub.Mobile.Models"
     Title="Properties">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Logout" Clicked="OnLogoutClicked" />
-    </ContentPage.ToolbarItems>
-
     <Grid Padding="20,16" RowDefinitions="Auto,Auto,*" RowSpacing="16">
         <VerticalStackLayout Spacing="4">
             <Label Text="Your properties" Style="{StaticResource PageTitle}" />

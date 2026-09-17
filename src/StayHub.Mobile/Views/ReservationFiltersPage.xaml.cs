@@ -18,8 +18,8 @@ public partial class ReservationFiltersPage : ContentPage
         InitializeComponent();
 
         StatusPicker.ItemsSource = new[] { "All statuses", "Confirmed", "Checked in", "Checked out", "Cancelled" };
-        PropertyPicker.ItemsSource = new object[] { "All properties" }.Concat(options.Properties.Cast<object>()).ToList();
-        SourcePicker.ItemsSource = new object[] { "All sources" }.Concat(options.Sources.Cast<object>()).ToList();
+        PropertyPicker.ItemsSource = new object[] { "All properties" }.Concat(options.Properties).ToList();
+        SourcePicker.ItemsSource = new object[] { "All sources" }.Concat(options.Sources).ToList();
         SortPicker.ItemsSource = new[] { "Arrival", "Departure", "Guest", "Property", "Created" };
         DirectionPicker.ItemsSource = new[] { "Ascending", "Descending" };
         PopulateSelections(options);

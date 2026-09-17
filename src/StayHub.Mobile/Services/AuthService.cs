@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
 using StayHub.Contracts.Authentication;
@@ -58,7 +59,7 @@ public sealed class AuthService(HttpClient httpClient) : IAuthService
 
         return !string.IsNullOrWhiteSpace(token)
                && !string.IsNullOrWhiteSpace(role)
-               && DateTime.TryParse(expiresAtValue, null, System.Globalization.DateTimeStyles.RoundtripKind, out var expiresAt)
+               && DateTime.TryParse(expiresAtValue, null, DateTimeStyles.RoundtripKind, out var expiresAt)
                && expiresAt > DateTime.UtcNow;
     }
 
