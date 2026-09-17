@@ -36,8 +36,40 @@ public partial class TodayPage : ContentPage
         {
             _dashboard = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(HasSynchronizationAlerts));
+            OnPropertyChanged(nameof(SynchronizationStatusTitle));
+            OnPropertyChanged(nameof(SynchronizationStatusDetail));
+            OnPropertyChanged(nameof(SynchronizationStatusColor));
         }
     }
+
+    public bool HasSynchronizationAlerts => Dashboard?.SynchronizationAlerts.Count > 0;
+
+    public string SynchronizationStatusTitle
+    {
+        get
+        {
+            var count = Dashboard?.SynchronizationAlerts.Count ?? 0;
+            return count == 0
+                ? "Synchronization healthy"
+                : $"{count} synchronization {(count == 1 ? "issue" : "issues")}";
+        }
+    }
+
+    public string SynchronizationStatusDetail
+    {
+        get
+        {
+            var latestAlert = Dashboard?.SynchronizationAlerts.FirstOrDefault();
+            return latestAlert is null
+                ? "No recent issues"
+                : latestAlert.ErrorMessage ?? latestAlert.Summary;
+        }
+    }
+
+    public Color SynchronizationStatusColor => HasSynchronizationAlerts
+        ? Color.FromArgb("#B3261E")
+        : Color.FromArgb("#2F7968");
 
     protected override async void OnAppearing()
     {
@@ -118,4 +150,12 @@ public partial class TodayPage : ContentPage
 
     private async void OnRefreshing(object? sender, EventArgs e) => await LoadDashboardAsync();
     private async void OnRetryClicked(object? sender, EventArgs e) => await LoadDashboardAsync();
+
+    private async void OnSynchronizationStatusTapped(object? sender, TappedEventArgs e)
+    {
+        if (!HasSynchronizationAlerts || Dashboard is null)
+            return;
+
+        await Navigation.PushAsync(new SynchronizationAlertsPage(Dashboard.SynchronizationAlerts));
+    }
 }
