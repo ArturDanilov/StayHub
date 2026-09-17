@@ -11,10 +11,9 @@ public partial class ReservationsPage : ContentPage
     private readonly IReservationFormService _reservationFormService;
     private readonly IAuthService _authService;
     private readonly IAppNavigator _navigator;
-    private readonly ToolbarItem _addReservationItem;
     private readonly ReservationSearchCriteria _criteria = new();
     private ReservationFormOptions? _filterOptions;
-    private CancellationTokenSource? _searchCancellation;
+    private bool _filtersInitialized;
     private bool _hasLoaded;
     private int _totalPages;
 
@@ -29,7 +28,6 @@ public partial class ReservationsPage : ContentPage
         _authService = authService;
         _navigator = navigator;
         InitializeComponent();
-        _addReservationItem = new ToolbarItem("Add", null, () => OnAddReservationClicked(null, EventArgs.Empty));
         BindingContext = this;
     }
 
@@ -39,11 +37,7 @@ public partial class ReservationsPage : ContentPage
     {
         base.OnAppearing();
         var role = await _authService.GetRoleAsync();
-        var canCreate = role is UserRoles.Admin or UserRoles.Receptionist;
-        if (canCreate && !ToolbarItems.Contains(_addReservationItem))
-            ToolbarItems.Add(_addReservationItem);
-        else if (!canCreate && ToolbarItems.Contains(_addReservationItem))
-            ToolbarItems.Remove(_addReservationItem);
+        AddReservationButton.IsVisible = role is UserRoles.Admin or UserRoles.Receptionist;
 
         if (!_hasLoaded)
             await LoadReservationsAsync();
@@ -100,33 +94,21 @@ public partial class ReservationsPage : ContentPage
         }
     }
 
-    private async void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
-    {
-        _searchCancellation?.Cancel();
-        _searchCancellation?.Dispose();
-        _searchCancellation = new CancellationTokenSource();
-        var token = _searchCancellation.Token;
-        try
-        {
-            await Task.Delay(400, token);
-            _criteria.Search = e.NewTextValue;
-            _criteria.Page = 1;
-            await LoadReservationsAsync(token);
-        }
-        catch (OperationCanceledException) when (token.IsCancellationRequested)
-        {
-        }
-    }
-
     private async void OnFiltersClicked(object? sender, EventArgs e)
     {
+        if (FilterPanel.IsVisible)
+        {
+            FilterPanel.IsVisible = false;
+            return;
+        }
+
         try
         {
             _filterOptions ??= await _reservationFormService.GetOptionsAsync();
-            await Navigation.PushModalAsync(new NavigationPage(new ReservationFiltersPage(
-                _criteria,
-                _filterOptions,
-                () => LoadReservationsAsync())));
+            if (!_filtersInitialized)
+                InitializeFilters(_filterOptions);
+
+            FilterPanel.IsVisible = true;
         }
         catch (UnauthorizedAccessException)
         {
@@ -138,6 +120,79 @@ public partial class ReservationsPage : ContentPage
             ErrorLabel.Text = exception.Message;
             ErrorPanel.IsVisible = true;
         }
+    }
+
+    private void InitializeFilters(ReservationFormOptions options)
+    {
+        StatusPicker.ItemsSource = new[] { "All statuses", "Confirmed", "Checked in", "Checked out", "Cancelled" };
+        PropertyPicker.ItemsSource = new object[] { "All properties" }.Concat(options.Properties).ToList();
+        SourcePicker.ItemsSource = new object[] { "All sources" }.Concat(options.Sources).ToList();
+        SortPicker.ItemsSource = new[] { "Arrival", "Departure", "Guest", "Property", "Created" };
+
+        SearchEntry.Text = _criteria.Search;
+        StatusPicker.SelectedIndex = _criteria.Status.HasValue ? (int)_criteria.Status.Value : 0;
+        PropertyPicker.SelectedItem = _criteria.PropertyId.HasValue
+            ? options.Properties.FirstOrDefault(item => item.Id == _criteria.PropertyId)
+            : PropertyPicker.ItemsSource.Cast<object>().First();
+        SourcePicker.SelectedItem = _criteria.SourceId.HasValue
+            ? options.Sources.FirstOrDefault(item => item.Id == _criteria.SourceId)
+            : SourcePicker.ItemsSource.Cast<object>().First();
+        SortPicker.SelectedIndex = (int)_criteria.SortBy;
+        _filtersInitialized = true;
+    }
+
+    private async void OnApplyFiltersClicked(object? sender, EventArgs e)
+    {
+        _criteria.Search = string.IsNullOrWhiteSpace(SearchEntry.Text) ? null : SearchEntry.Text.Trim();
+        _criteria.Status = StatusPicker.SelectedIndex > 0
+            ? (StayHub.Contracts.Reservations.ReservationStatusContract)StatusPicker.SelectedIndex
+            : null;
+        _criteria.PropertyId = (PropertyPicker.SelectedItem as PropertyOption)?.Id;
+        _criteria.SourceId = (SourcePicker.SelectedItem as SourceOption)?.Id;
+        _criteria.SortBy = (StayHub.Contracts.Reservations.ReservationSortBy)Math.Max(0, SortPicker.SelectedIndex);
+        _criteria.Page = 1;
+
+        FilterErrorLabel.IsVisible = false;
+        FilterPanel.IsVisible = false;
+        SearchEntry.Unfocus();
+        UpdateFilterButton();
+        await LoadReservationsAsync();
+    }
+
+    private async void OnClearFiltersClicked(object? sender, EventArgs e)
+    {
+        SearchEntry.Text = string.Empty;
+        StatusPicker.SelectedIndex = 0;
+        PropertyPicker.SelectedIndex = 0;
+        SourcePicker.SelectedIndex = 0;
+        SortPicker.SelectedIndex = 0;
+
+        _criteria.Search = null;
+        _criteria.Status = null;
+        _criteria.PropertyId = null;
+        _criteria.SourceId = null;
+        _criteria.ArrivalFrom = null;
+        _criteria.ArrivalTo = null;
+        _criteria.SortBy = StayHub.Contracts.Reservations.ReservationSortBy.ArrivalDate;
+        _criteria.SortDirection = StayHub.Contracts.Reservations.SortDirection.Ascending;
+        _criteria.Page = 1;
+
+        FilterPanel.IsVisible = false;
+        SearchEntry.Unfocus();
+        UpdateFilterButton();
+        await LoadReservationsAsync();
+    }
+
+    private void UpdateFilterButton()
+    {
+        var hasActiveFilters =
+            !string.IsNullOrWhiteSpace(_criteria.Search) ||
+            _criteria.Status.HasValue ||
+            _criteria.PropertyId.HasValue ||
+            _criteria.SourceId.HasValue;
+
+        FilterToggleButton.Text = "⌕";
+        FilterToggleButton.Opacity = hasActiveFilters ? 1 : 0.8;
     }
 
     private async void OnPreviousClicked(object? sender, EventArgs e)
@@ -183,12 +238,11 @@ public partial class ReservationsPage : ContentPage
     private async void OnRefreshing(object? sender, EventArgs e) => await LoadReservationsAsync();
     private async void OnRetryClicked(object? sender, EventArgs e) => await LoadReservationsAsync();
 
-    private async void OnReservationSelected(object? sender, SelectionChangedEventArgs e)
+    private async void OnReservationTapped(object? sender, TappedEventArgs e)
     {
-        if (e.CurrentSelection.FirstOrDefault() is not ReservationOverview reservation)
+        if (e.Parameter is not ReservationOverview reservation)
             return;
 
-        ReservationsCollection.SelectedItem = null;
         var role = await _authService.GetRoleAsync();
         await Navigation.PushAsync(new ReservationDetailPage(
             reservation,
