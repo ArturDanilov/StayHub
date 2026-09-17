@@ -258,3 +258,5 @@ app.MapHealthChecks(
     });
 
 app.Run();
+
+public partial class Program;
