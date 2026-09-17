@@ -42,6 +42,12 @@ Both endpoints require the `ManageReservations` authorization policy.
 - Every run records its status, timestamps, created/updated/unchanged counts,
   conflict count, failure count, and a bounded error summary.
 
+The accepted transaction behavior is documented in
+[ADR 0001](adr/0001-synchronization-transaction-boundaries.md). One external
+reservation is the atomic unit; the complete run is intentionally not wrapped
+in one transaction. SH-7 records this design decision and does not yet change
+the current persistence implementation.
+
 ## Cloud note
 
 `localhost` only works when both APIs run on the same development machine. For
