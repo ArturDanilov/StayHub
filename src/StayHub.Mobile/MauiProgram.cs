@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Handlers;
 using StayHub.Mobile.Configuration;
 using StayHub.Mobile.Services;
 using StayHub.Mobile.Views;
@@ -26,7 +27,7 @@ public static class MauiProgram
                     typeof(Shell),
                     typeof(StayHubShellRenderer));
 
-                Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping(
+                EntryHandler.Mapper.AppendToMapping(
                     "RemoveInputAccessoryView",
                     (handler, view) =>
                     {
@@ -71,6 +72,7 @@ public static class MauiProgram
         builder.Services.AddTransient<PropertiesPage>();
         builder.Services.AddTransient<ReservationsPage>();
         builder.Services.AddTransient<AssistantPage>();
+        builder.Services.AddTransient<AccountPage>();
         builder.Services.AddTransient<UsersPage>();
         builder.Services.AddTransient<SynchronizationPage>();
 

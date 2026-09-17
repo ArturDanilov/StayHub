@@ -14,10 +14,6 @@ public sealed class StayHubShellRenderer : ShellRenderer
 
 public sealed class StayHubTabBarAppearanceTracker : ShellTabBarAppearanceTracker
 {
-    public StayHubTabBarAppearanceTracker() : base()
-    {
-    }
-
     public override void SetAppearance(
         UITabBarController controller,
         ShellAppearance appearance)
@@ -43,32 +39,41 @@ public sealed class StayHubTabBarAppearanceTracker : ShellTabBarAppearanceTracke
 
         foreach (var item in tabBar.Items)
         {
-            item.TitlePositionAdjustment = new UIOffset(0, -10);
+            var title = item.Title ?? item.AccessibilityLabel;
+            item.AccessibilityLabel = title;
+            item.Image = GetTabIcon(title);
+            item.SelectedImage = GetTabIcon(title);
+            item.Title = null;
+            item.ImageInsets = new UIEdgeInsets(6, 0, -6, 0);
         }
+    }
+
+    private static UIImage? GetTabIcon(string? title)
+    {
+        var symbolName = title switch
+        {
+            "Today" => "calendar",
+            "Properties" => "building.2",
+            "Bookings" => "book.closed",
+            "Sync" => "arrow.triangle.2.circlepath",
+            "Users" => "person.2",
+            "Account" => "person.crop.circle",
+            _ => null
+        };
+
+        return symbolName is null ? null : UIImage.GetSystemImage(symbolName);
     }
 
     private static void ConfigureLayout(UITabBarItemAppearance appearance)
     {
-        appearance.Normal.TitlePositionAdjustment =
-            new UIOffset(0, -10);
+        appearance.Normal.TitleTextAttributes = new UIStringAttributes
+        {
+            ForegroundColor = UIColor.Clear
+        };
 
-        appearance.Normal.TitleTextAttributes =
-            new UIStringAttributes
-            {
-                Font = UIFont.SystemFontOfSize(
-                    14,
-                    UIFontWeight.Semibold)
-            };
-
-        appearance.Selected.TitlePositionAdjustment =
-            new UIOffset(0, -10);
-
-        appearance.Selected.TitleTextAttributes =
-            new UIStringAttributes
-            {
-                Font = UIFont.SystemFontOfSize(
-                    14,
-                    UIFontWeight.Bold)
-            };
+        appearance.Selected.TitleTextAttributes = new UIStringAttributes
+        {
+            ForegroundColor = UIColor.Clear
+        };
     }
 }

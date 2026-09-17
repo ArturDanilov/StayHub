@@ -2,9 +2,9 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using StayHub.Contracts.Common;
 using StayHub.Contracts.Reservations;
 using StayHub.Mobile.Models;
-using StayHub.Contracts.Common;
 
 namespace StayHub.Mobile.Services;
 

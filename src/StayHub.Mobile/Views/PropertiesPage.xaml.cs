@@ -91,9 +91,4 @@ public partial class PropertiesPage : ContentPage
         await LoadPropertiesAsync();
     }
 
-    private async void OnLogoutClicked(object? sender, EventArgs e)
-    {
-        await _authService.LogoutAsync();
-        _navigator.ShowLogin();
-    }
 }

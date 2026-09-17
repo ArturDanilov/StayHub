@@ -8,33 +8,27 @@
     <TabBar>
         <ShellContent
             x:Name="TodayContent"
+            Icon="today.svg"
             Title="Today"
             Route="Today" />
 
         <ShellContent
             x:Name="PropertiesContent"
+            Icon="properties.svg"
             Title="Properties"
             Route="Properties" />
 
         <ShellContent
             x:Name="ReservationsContent"
+            Icon="reservations.svg"
             Title="Bookings"
             Route="Reservations" />
 
         <ShellContent
-            x:Name="AssistantContent"
-            Title="AI"
-            Route="Assistant" />
-
-        <ShellContent
-            x:Name="SynchronizationContent"
-            Title="Sync"
-            Route="Synchronization" />
-
-        <ShellContent
-            x:Name="UsersContent"
-            Title="Users"
-            Route="Users" />
+            x:Name="AccountContent"
+            Icon="users.svg"
+            Title="Account"
+            Route="Account" />
     </TabBar>
 
 </Shell>

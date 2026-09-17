@@ -1,9 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using StayHub.Mobile.Views;
 
 namespace StayHub.Mobile;
 
-public partial class App : Application
+public partial class App
 {
     private readonly IServiceProvider _services;
 
