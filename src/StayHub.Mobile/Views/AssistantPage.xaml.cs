@@ -7,6 +7,8 @@ namespace StayHub.Mobile.Views;
 
 public partial class AssistantPage : ContentPage
 {
+    private const double TabBarClearance = 104;
+    private const double KeyboardClearance = 12;
     private readonly IAssistantService _assistantService;
     private bool _isSending;
 
@@ -21,15 +23,21 @@ public partial class AssistantPage : ContentPage
 
     private async void OnSendClicked(object? sender, EventArgs e) => await SendCurrentQuestionAsync();
 
-    private async void OnRussianSuggestionClicked(object? sender, EventArgs e)
+    private void OnQuestionEntryFocused(object? sender, FocusEventArgs e) =>
+        SetBottomClearance(KeyboardClearance);
+
+    private void OnQuestionEntryUnfocused(object? sender, FocusEventArgs e) =>
+        SetBottomClearance(TabBarClearance);
+
+    private async void OnNextArrivalSuggestionClicked(object? sender, EventArgs e)
     {
-        QuestionEntry.Text = "Кто заезжает следующим?";
+        QuestionEntry.Text = "Who is arriving next?";
         await SendCurrentQuestionAsync();
     }
 
-    private async void OnGermanSuggestionClicked(object? sender, EventArgs e)
+    private async void OnTodayDeparturesSuggestionClicked(object? sender, EventArgs e)
     {
-        QuestionEntry.Text = "Welche Gäste reisen als Nächstes an?";
+        QuestionEntry.Text = "Who is checking out today?";
         await SendCurrentQuestionAsync();
     }
 
@@ -83,4 +91,7 @@ public partial class AssistantPage : ContentPage
         SendingIndicator.IsVisible = isSending;
         SendingIndicator.IsRunning = isSending;
     }
+
+    private void SetBottomClearance(double bottom) =>
+        PageLayout.Padding = new Thickness(20, 12, 20, bottom);
 }

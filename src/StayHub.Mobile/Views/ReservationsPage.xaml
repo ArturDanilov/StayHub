@@ -6,7 +6,7 @@
     xmlns:models="clr-namespace:StayHub.Mobile.Models"
     Title="Bookings">
 
-    <Grid Padding="20,16,20,10" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+    <Grid Padding="20,16,20,10" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
         <Grid ColumnDefinitions="*,Auto">
             <VerticalStackLayout Spacing="4">
                 <Label Text="Bookings" Style="{StaticResource PageTitle}" />
@@ -17,21 +17,92 @@
             </Border>
         </Grid>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
-            <Border BackgroundColor="{StaticResource Secondary}" Stroke="{StaticResource Primary}" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="12,0">
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                    <Label Text="⌕" FontSize="25" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
-                    <Entry x:Name="SearchEntry" Grid.Column="1" Placeholder="Search bookings" BackgroundColor="Transparent"
-                           IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" TextChanged="OnSearchTextChanged" />
-                </Grid>
-            </Border>
-            <Button Grid.Column="1" Text="Filters" Clicked="OnFiltersClicked" Padding="16,10" />
-        </Grid>
+        <HorizontalStackLayout
+            Grid.Row="1"
+            Spacing="10">
+            <Button
+                x:Name="FilterToggleButton"
+                Text="⌕"
+                FontSize="26"
+                WidthRequest="54"
+                HeightRequest="48"
+                Padding="0"
+                SemanticProperties.Description="Open search and filters"
+                Clicked="OnFiltersClicked" />
 
-        <Grid Grid.Row="2">
+            <Button
+                x:Name="AddReservationButton"
+                Text="+"
+                FontSize="28"
+                WidthRequest="54"
+                HeightRequest="48"
+                Padding="0"
+                IsVisible="False"
+                SemanticProperties.Description="Add booking"
+                Clicked="OnAddReservationClicked" />
+        </HorizontalStackLayout>
+
+        <Border
+            x:Name="FilterPanel"
+            Grid.Row="2"
+            IsVisible="False"
+            Padding="16"
+            BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray900}}"
+            Stroke="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}"
+            StrokeShape="RoundRectangle 20">
+            <VerticalStackLayout Spacing="12">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Label
+                        Text="⌕"
+                        FontSize="24"
+                        TextColor="{StaticResource Primary}"
+                        VerticalOptions="Center" />
+                    <Entry
+                        x:Name="SearchEntry"
+                        Grid.Column="1"
+                        Placeholder="Guest, property or booking ID"
+                        PlaceholderColor="{StaticResource Gray300}"
+                        TextColor="{AppThemeBinding Light=Black, Dark=White}"
+                        BackgroundColor="Transparent"
+                        IsSpellCheckEnabled="False"
+                        IsTextPredictionEnabled="False" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Status" Style="{StaticResource Caption}" />
+                        <Picker x:Name="StatusPicker" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="Property" Style="{StaticResource Caption}" />
+                        <Picker x:Name="PropertyPicker" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Source" Style="{StaticResource Caption}" />
+                        <Picker x:Name="SourcePicker" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="Sort" Style="{StaticResource Caption}" />
+                        <Picker x:Name="SortPicker" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Label x:Name="FilterErrorLabel" IsVisible="False" TextColor="#FF6B6B" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Button Text="Clear" Clicked="OnClearFiltersClicked" />
+                    <Button Grid.Column="1" Text="Apply" Clicked="OnApplyFiltersClicked" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+
+        <Grid Grid.Row="3">
             <RefreshView x:Name="ReservationsRefreshView" Refreshing="OnRefreshing" VerticalOptions="Fill">
                 <CollectionView x:Name="ReservationsCollection" ItemsSource="{Binding Reservations}"
-                                SelectionMode="Single" SelectionChanged="OnReservationSelected"
+                                SelectionMode="None"
                                 VerticalOptions="Fill" VerticalScrollBarVisibility="Always">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
@@ -39,6 +110,11 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:ReservationOverview">
                             <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        CommandParameter="{Binding .}"
+                                        Tapped="OnReservationTapped" />
+                                </Border.GestureRecognizers>
                                 <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6" ColumnSpacing="10">
                                     <Label Text="{Binding GuestName}" Style="{StaticResource SectionTitle}" />
                                     <Border Grid.Column="1" BackgroundColor="{Binding StatusColor}" StrokeThickness="0"
@@ -70,7 +146,7 @@
 
         <Grid
             x:Name="PaginationPanel"
-            Grid.Row="3"
+            Grid.Row="4"
             ColumnDefinitions="*,Auto,*"
             ColumnSpacing="12"
             HeightRequest="44"
