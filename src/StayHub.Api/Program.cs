@@ -6,7 +6,6 @@ using StayHub.Dal.Data;
 using StayHub.Dal.Repositories;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using StayHub.Api.Authentication;

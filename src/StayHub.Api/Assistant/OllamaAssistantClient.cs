@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using Microsoft.Extensions.Options;
 using StayHub.Business.Interfaces;
 using StayHub.Business.Models;
@@ -31,7 +30,10 @@ public sealed class OllamaAssistantClient(HttpClient httpClient, IOptions<AiAssi
 
             return result.Message.Content.Trim();
         }
-        catch (AssistantUnavailableException) { throw; }
+        catch (AssistantUnavailableException)
+        {
+            throw;
+        }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             throw new AssistantUnavailableException(
@@ -46,7 +48,12 @@ public sealed class OllamaAssistantClient(HttpClient httpClient, IOptions<AiAssi
     }
 
     private sealed record OllamaChatRequest(
-        string Model, IReadOnlyList<AssistantPromptMessage> Messages, bool Stream, bool Think);
+        string Model,
+        IReadOnlyList<AssistantPromptMessage> Messages,
+        bool Stream,
+        bool Think);
+
     private sealed record OllamaChatResponse(OllamaMessage? Message);
+
     private sealed record OllamaMessage(string Content);
 }
