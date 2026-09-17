@@ -19,6 +19,12 @@
             Route="Properties" />
 
         <ShellContent
+            x:Name="AssistantContent"
+            Icon="assistant.svg"
+            Title="AI"
+            Route="Assistant" />
+
+        <ShellContent
             x:Name="ReservationsContent"
             Icon="reservations.svg"
             Title="Bookings"
