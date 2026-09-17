@@ -210,4 +210,5 @@ user-secrets locally and Azure Container App secrets in the cloud.
 - [Azure deployment](docs/AZURE_DEPLOYMENT.md)
 - [Reservation synchronization](docs/SYNCHRONIZATION.md)
 - [Synchronization transaction ADR](docs/adr/0001-synchronization-transaction-boundaries.md)
+- [Reservation concurrency ADR](docs/adr/0002-reservation-optimistic-concurrency.md)
 - [Roadmap](docs/roadmap.md)

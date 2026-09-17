@@ -48,6 +48,12 @@ reservation is the atomic unit; the complete run is intentionally not wrapped
 in one transaction. SH-7 records this design decision and does not yet change
 the current persistence implementation.
 
+Reservation updates will use optimistic concurrency as defined in
+[ADR 0002](adr/0002-reservation-optimistic-concurrency.md). A user/PMS race will
+be reported for that external reservation instead of silently overwriting the
+other change. SH-8 records this decision and does not yet add the concurrency
+token or migration.
+
 ## Cloud note
 
 `localhost` only works when both APIs run on the same development machine. For
