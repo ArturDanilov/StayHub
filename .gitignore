@@ -2,5 +2,6 @@
 **/obj/
 .idea/
 .vs/
+*.DotSettings.user
 *.log
 .DS_Store
